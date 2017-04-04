@@ -87,6 +87,7 @@
 (defvar zig-mode-types
   '("Unreachable"
     "error"
+    "type"
 
     "bool"
     "c_int" "c_long" "c_long_double" "c_longlong" "c_short"
@@ -96,7 +97,7 @@
     "i8" "i16" "i32" "i64" "isize"
     "u8" "u16" "u32" "u64" "usize"
 
-    "type"
+    "noreturn"
     "void"))
 
 (defvar zig-mode-font-lock-keywords
