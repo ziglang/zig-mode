@@ -52,35 +52,32 @@
 
 (defvar zig-mode-keywords
   '("asm"
-    "break"
     "coldcc"
-    "comptime"
-    "const"
-    "continue"
-    "defer"
-    "else"
-    "enum"
-    "export"
-    "extern"
-    "fn"
-    "for"
-    "goto"
-    "if"
     "inline"
     "nakedcc"
     "noalias"
-    "packed"
-    "pub"
-    "return"
-    "struct"
-    "switch"
-    "try"
-    "union"
     "unreachable"
     "use"
-    "var"
+
+    "export"
+    "extern"
+    "pub"
+    "fn"
+
+    "enum" "struct" "union"
+    "packed"
+    "comptime"
+    "const" "var"
     "volatile"
-    "while"))
+
+    "try"
+    "defer"
+
+    "if" "else"
+    "for" "while"
+    "goto" "break" "continue"
+    "switch"
+    "return"))
 
 (defvar zig-mode-constants
   '("null"
@@ -89,32 +86,18 @@
 
 (defvar zig-mode-types
   '("Unreachable"
-    "bool"
-    "c_int"
-    "c_long"
-    "c_long_double"
-    "c_longlong"
-    "c_short"
-    "c_uint"
-    "c_ulong"
-    "c_ulonglong"
-    "c_ushort"
     "error"
-    "f32"
-    "f64"
-    "i16"
-    "i32"
-    "i64"
-    "i8"
-    "isize"
+
+    "bool"
+    "c_int" "c_long" "c_long_double" "c_longlong" "c_short"
+    "c_uint" "c_ulong" "c_ulonglong" "c_ushort"
+
+    "f32" "f64"
+    "i8" "i16" "i32" "i64" "isize"
+    "u8" "u16" "u32" "u64" "usize"
+
     "type"
-    "u16"
-    "u32"
-    "u64"
-    "u8"
-    "usize"
-    "void"
-    ))
+    "void"))
 
 (defvar zig-mode-font-lock-keywords
   `((,(regexp-opt zig-mode-keywords)  . font-lock-keyword-face)
