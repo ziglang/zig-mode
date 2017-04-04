@@ -101,10 +101,10 @@
     "void"))
 
 (defvar zig-mode-font-lock-keywords
-  `((,(regexp-opt zig-mode-keywords)  . font-lock-keyword-face)
-    (,(regexp-opt zig-mode-builtins)  . font-lock-builtin-face)
-    (,(regexp-opt zig-mode-constants) . font-lock-constant-face)
-    (,(regexp-opt zig-mode-types)     . font-lock-type-face)))
+  `((,(regexp-opt zig-mode-keywords  'symbols) . font-lock-keyword-face)
+    (,(regexp-opt zig-mode-builtins  'symbols) . font-lock-builtin-face)
+    (,(regexp-opt zig-mode-constants 'symbols) . font-lock-constant-face)
+    (,(regexp-opt zig-mode-types     'symbols) . font-lock-type-face)))
 
 ;;;###autoload
 (define-derived-mode zig-mode c-mode "Zig"
