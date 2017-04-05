@@ -10,7 +10,7 @@
 ;;
 
 ;;; Code:
-(defvar zig-mode-builtins
+(defvar zig--builtins
   '("@addWithOverflow"
     "@mulWithOverflow"
     "@shlWithOverflow"
@@ -43,7 +43,7 @@
     "@truncate"
     "@unreachable"))
 
-(defvar zig-mode-keywords
+(defvar zig--keywords
   '("asm"
     "noalias"
     "unreachable"
@@ -68,12 +68,13 @@
     "switch"
     "return"))
 
-(defvar zig-mode-constants
+(defvar zig--constants
   '("null"
     "this"
+    "true" "false"
     "undefined"))
 
-(defvar zig-mode-types
+(defvar zig--types
   '("Unreachable"
     "error"
     "type"
@@ -89,17 +90,24 @@
     "noreturn"
     "void"))
 
-(defvar zig-mode-font-lock-keywords
-  `((,(regexp-opt zig-mode-keywords  'symbols) . font-lock-keyword-face)
-    (,(regexp-opt zig-mode-builtins          ) . font-lock-builtin-face)
-    (,(regexp-opt zig-mode-constants 'symbols) . font-lock-constant-face)
-    (,(regexp-opt zig-mode-types     'symbols) . font-lock-type-face)))
+(defvar zig--font-lock-keywords
+  `((,(regexp-opt zig--keywords  'symbols) . font-lock-keyword-face)
+    (,(regexp-opt zig--builtins          ) . font-lock-builtin-face)
+    (,(regexp-opt zig--constants 'symbols) . font-lock-constant-face)
+    (,(regexp-opt zig--types     'symbols) . font-lock-type-face)))
+
+
+(defvar zig-mode-init-hook nil
+  "This hook is called when 'zig-mode' is initialized.")
+
+;; Indentation is 4 spaces by default:
+(add-hook 'zig-mode-init-hook '(lambda() (setq-local c-basic-offset 4)))
 
 ;;;###autoload
 (define-derived-mode zig-mode c-mode "Zig"
   "A major mode for the Zig programming language."
-  :group 'zig-mode
-  (setq-local font-lock-defaults '(zig-mode-font-lock-keywords)))
+  (run-hooks 'zig-mode-init-hook)
+  (setq-local font-lock-defaults '(zig--font-lock-keywords)))
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.zig\\'" . zig-mode))
