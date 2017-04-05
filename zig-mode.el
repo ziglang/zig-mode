@@ -10,6 +10,9 @@
 ;;
 
 ;;; Code:
+
+(require 'cc-mode)
+
 (defvar zig--builtins
   '("@addWithOverflow"
     "@mulWithOverflow"
@@ -101,13 +104,13 @@
   "This hook is called when 'zig-mode' is initialized.")
 
 ;; Indentation is 4 spaces by default:
-(add-hook 'zig-mode-init-hook '(lambda() (setq-local c-basic-offset 4)))
+(add-hook 'zig-mode-init-hook '(lambda() (setq c-basic-offset 4)))
 
 ;;;###autoload
 (define-derived-mode zig-mode c-mode "Zig"
   "A major mode for the Zig programming language."
   (run-hooks 'zig-mode-init-hook)
-  (setq-local font-lock-defaults '(zig--font-lock-keywords)))
+  (setq font-lock-defaults '(zig--font-lock-keywords)))
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.zig\\'" . zig-mode))
