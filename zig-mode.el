@@ -100,16 +100,10 @@
     (,(regexp-opt zig--types     'symbols) . font-lock-type-face)))
 
 
-(defvar zig-mode-init-hook nil
-  "This hook is called when 'zig-mode' is initialized.")
-
-;; Indentation is 4 spaces by default:
-(add-hook 'zig-mode-init-hook '(lambda() (setq c-basic-offset 4)))
-
 ;;;###autoload
 (define-derived-mode zig-mode c-mode "Zig"
   "A major mode for the Zig programming language."
-  (run-hooks 'zig-mode-init-hook)
+  (setq c-basic-offset 4)
   (setq font-lock-defaults '(zig--font-lock-keywords)))
 
 ;;;###autoload
