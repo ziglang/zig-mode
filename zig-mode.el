@@ -36,6 +36,7 @@
 
     "@compileError" "@compileLog" "@compileVar"
     "@errorName"
+    "@panic"
 
     "@import" "@embedFile"
     "@clz"
@@ -68,6 +69,7 @@
     "if" "else"
     "for" "while"
     "goto" "break" "continue"
+    "or" "and"
     "switch"
     "return"))
 
