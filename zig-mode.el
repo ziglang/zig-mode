@@ -1,6 +1,6 @@
 ;;; zig-mode.el --- A major mode for the Zig programming language -*- lexical-binding: t -*-
 
-;; Version: 0.0.1
+;; Version: 0.0.2
 ;; Author: Andrea Orru <andreaorru1991@gmail.com>, Andrew Kelley <superjoe30@gmail.com>
 ;; Keywords: zig, languages
 ;; Package-Requires: ((emacs "24.0"))
@@ -13,100 +13,109 @@
 
 (require 'cc-mode)
 
-(defvar zig--builtins
-  '("@addWithOverflow"
-    "@mulWithOverflow"
-    "@shlWithOverflow"
-    "@subWithOverflow"
-    "@divExact"
+(defun zig-re-word (inner)
+  "Construct a regular expression for the word INNER."
+  (concat "\\<" inner "\\>"))
 
-    "@cDefine" "@cImport" "@cInclude" "@cUndef"
-    "@setGlobalAlign" "@setGlobalLinkage" "@setGlobalSection"
-    "@setDebugSafety"
+(defun zig-re-grab (inner)
+  "Construct a group regular expression for INNER."
+  (concat "\\(" inner "\\)"))
 
-    "@alignOf" "@sizeOf"
-    "@typeName" "@typeOf"
-    "@intType" "@isFloat" "@isInteger"
-    "@maxValue" "@minValue"
-    "@memberCount"
-    "@canImplicitCast"
+(defconst zig-re-identifier "[[:word:]_][[:word:]_[:digit:]]*")
+(defconst zig-re-type-annotation
+  (concat (zig-re-grab zig-re-identifier)
+          "[[:space:]]*:[[:space:]]*"
+          (zig-re-grab zig-re-identifier)))
 
-    "@alloca"
-    "@memcpy" "@memset"
+(defun zig-re-definition (dtype)
+  "Construct a regular expression for definitions of type DTYPE."
+  (concat (zig-re-word dtype) "[[:space:]]+" (zig-re-grab zig-re-identifier)))
 
-    "@compileError" "@compileLog" "@compileVar"
-    "@errorName"
-    "@panic"
+(defconst zig-syntax-table
+  (let ((table (make-syntax-table)))
 
-    "@import" "@embedFile"
-    "@clz"
-    "@cmpxchg"
-    "@ctz"
-    "@fence"
-    "@generatedCode"
-    "@truncate"
-    "@unreachable"))
+    ;; Operators
+    (dolist (i '(?+ ?- ?* ?/ ?% ?& ?| ?= ?! ?< ?>))
+      (modify-syntax-entry i "." table))
 
-(defvar zig--keywords
-  '("asm"
+    ;; Strings
+    (modify-syntax-entry ?\' "\"" table)
+    (modify-syntax-entry ?\" "\"" table)
+    (modify-syntax-entry ?\\ "\\" table)
+
+    ;; Comments
+    (modify-syntax-entry ?/  ". 12" table)
+    (modify-syntax-entry ?\n ">"    table)
+
+    table))
+
+(defconst zig-keywords
+  '("const" "var"
+    "export" "extern" "pub"
+
     "noalias"
-    "unreachable"
-    "use"
-
-    "coldcc" "nakedcc"
-    "export" "extern" "inline" "pub"
-    "fn"
-
-    "enum" "struct" "union"
-    "packed"
-    "comptime"
-    "const" "var"
+    "inline" "comptime"
+    "nakedcc" "coldcc"
     "volatile"
 
-    "try"
-    "defer"
+    "packed" "struct" "enum" "union"
+    "fn" "use" "test"
 
-    "if" "else"
-    "for" "while"
-    "goto" "break" "continue"
-    "or" "and"
-    "switch"
-    "return"))
+    "asm" "goto" "try"
+    "break" "return" "continue" "defer"
+    "unreachable"
 
-(defvar zig--constants
-  '("null"
-    "this"
-    "true" "false"
-    "undefined"))
+    "if" "else" "switch"
+    "and" "or"
 
-(defvar zig--types
-  '("Unreachable"
-    "error"
-    "type"
+    "while" "for"))
 
-    "bool"
-    "c_int" "c_long" "c_long_double" "c_longlong" "c_short"
-    "c_uint" "c_ulong" "c_ulonglong" "c_ushort"
+(defconst zig-types
+  '("void" "noreturn" "type" "error"
 
     "i8" "i16" "i32" "i64" "isize"
     "u8" "u16" "u32" "u64" "usize"
     "f32" "f64"
+    "bool"
 
-    "noreturn"
-    "void"))
+    "c_short"  "c_int"  "c_long"  "c_longlong"
+    "c_ushort" "c_uint" "c_ulong" "c_ulonglong"
+    "c_long_double"))
 
-(defvar zig--font-lock-keywords
-  `((,(regexp-opt zig--keywords  'symbols) . font-lock-keyword-face)
-    (,(regexp-opt zig--builtins          ) . font-lock-builtin-face)
-    (,(regexp-opt zig--constants 'symbols) . font-lock-constant-face)
-    (,(regexp-opt zig--types     'symbols) . font-lock-type-face)))
+(defconst zig-constants
+  '("null" "undefined" "this"
+    "true" "false"))
 
+(defvar zig-font-lock-keywords
+  (append
+   `(
+     ;; Builtins (prefixed with @)
+     (,(concat "@" zig-re-identifier) . font-lock-builtin-face)
+
+     ;; Keywords, constants and types
+     (,(regexp-opt zig-keywords  'symbols) . font-lock-keyword-face)
+     (,(regexp-opt zig-constants 'symbols) . font-lock-constant-face)
+     (,(regexp-opt zig-types     'symbols) . font-lock-type-face)
+
+     ;; Type annotations (both variable and type)
+     (,zig-re-type-annotation 1 font-lock-variable-name-face)
+     (,zig-re-type-annotation 2 font-lock-type-face)
+     )
+
+   ;; Definitions
+   (mapcar #'(lambda (x)
+               (list (zig-re-definition (car x))
+                     1 (cdr x)))
+           '(("const" . font-lock-variable-name-face)
+             ("var"   . font-lock-variable-name-face)
+             ("fn"    . font-lock-function-name-face)))))
 
 ;;;###autoload
 (define-derived-mode zig-mode c-mode "Zig"
-  "A major mode for the Zig programming language."
+  "A major mode for the zig programming language."
+  :syntax-table zig-syntax-table
   (setq c-basic-offset 4)
-  (setq font-lock-defaults '(zig--font-lock-keywords)))
+  (setq font-lock-defaults '(zig-font-lock-keywords)))
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.zig\\'" . zig-mode))
