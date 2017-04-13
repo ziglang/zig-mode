@@ -3,7 +3,7 @@
 ;; Version: 0.0.2
 ;; Author: Andrea Orru <andreaorru1991@gmail.com>, Andrew Kelley <superjoe30@gmail.com>
 ;; Keywords: zig, languages
-;; Package-Requires: ((emacs "24.0"))
+;; Package-Requires: ((emacs "24"))
 ;; URL: https://github.com/AndreaOrru/zig-mode
 
 ;;; Commentary:
@@ -31,7 +31,7 @@
   "Construct a regular expression for definitions of type DTYPE."
   (concat (zig-re-word dtype) "[[:space:]]+" (zig-re-grab zig-re-identifier)))
 
-(defconst zig-syntax-table
+(defconst zig-mode-syntax-table
   (let ((table (make-syntax-table)))
 
     ;; Operators
@@ -113,8 +113,7 @@
 ;;;###autoload
 (define-derived-mode zig-mode c-mode "Zig"
   "A major mode for the zig programming language."
-  :syntax-table zig-syntax-table
-  (setq c-basic-offset 4)
+  (set (make-local-variable 'c-basic-offset) 4)
   (setq font-lock-defaults '(zig-font-lock-keywords)))
 
 ;;;###autoload
