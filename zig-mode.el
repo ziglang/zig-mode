@@ -68,13 +68,13 @@
 
     "noalias"
     "inline" "comptime"
-    "nakedcc" "coldcc"
-    "volatile"
+    "nakedcc" "coldcc" "stdcallcc"
+    "volatile" "align"
 
     "packed" "struct" "enum" "union"
     "fn" "use" "test"
 
-    "asm" "goto" "try"
+    "asm" "goto"
     "break" "return" "continue" "defer"
     "unreachable"
 
@@ -86,14 +86,14 @@
 (defconst zig-types
   '("void" "noreturn" "type" "error"
 
-    "i8" "i16" "i32" "i64" "isize"
-    "u8" "u16" "u32" "u64" "usize"
-    "f32" "f64"
+    "i2" "i3" "i4" "i5" "i6" "i7" "i8" "i16" "i32" "i64" "i128" "isize"
+    "u2" "u3" "u4" "u5" "u6" "u7" "u8" "u16" "u32" "u64" "u128" "usize"
+    "f32" "f64" "f128"
     "bool"
 
     "c_short"  "c_int"  "c_long"  "c_longlong"
     "c_ushort" "c_uint" "c_ulong" "c_ulonglong"
-    "c_long_double"))
+    "c_longdouble" "c_void"))
 
 (defconst zig-constants
   '("null" "undefined" "this"
