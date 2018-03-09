@@ -1,6 +1,6 @@
 ;;; zig-mode.el --- A major mode for the Zig programming language -*- lexical-binding: t -*-
 
-;; Version: 0.0.2
+;; Version: 0.0.3
 ;; Author: Andrea Orru <andreaorru1991@gmail.com>, Andrew Kelley <superjoe30@gmail.com>
 ;; Keywords: zig, languages
 ;; Package-Requires: ((emacs "24"))
@@ -63,41 +63,53 @@
     table))
 
 (defconst zig-keywords
-  '("const" "var"
-    "export" "extern" "pub"
+  '(
+    ;; Storage
+    "const" "var" "extern" "packed" "export" "pub" "noalias" "inline"
+    "comptime" "nakedcc" "stdcallcc" "volatile" "align" "section"
 
-    "noalias"
-    "inline" "comptime"
-    "nakedcc" "coldcc" "stdcallcc"
-    "volatile" "align"
+    ;; Structure
+    "struct" "enum" "union"
 
-    "packed" "struct" "enum" "union"
-    "fn" "use" "test"
+    ;; Statement
+    "break" "return" "continue" "asm" "defer" "errdefer" "unreachable"
+    "try" "catch" "async" "await" "suspend" "resume" "cancel"
 
-    "asm" "goto"
-    "break" "return" "continue" "defer"
-    "unreachable"
+    ;; Conditional
+    "if" "else" "switch" "and" "or"
 
-    "if" "else" "switch"
-    "and" "or"
+    ;; Repeat
+    "while" "for"
 
-    "while" "for"))
+    ;; Other keywords
+    "fn" "use" "test"))
 
 (defconst zig-types
-  '("void" "noreturn" "type" "error"
+  '(
+    ;; Integer types
+    "i2" "u2" "i3" "u3" "i4" "u4" "i5" "u5" "i6" "u6" "i7" "u7" "i8" "u8"
+    "i16" "u16" "i29" "u29" "i32" "u32" "i64" "u64" "i128" "u128"
+    "isize" "usize"
 
-    "i2" "i3" "i4" "i5" "i6" "i7" "i8" "i16" "i32" "i64" "i128" "isize"
-    "u2" "u3" "u4" "u5" "u6" "u7" "u8" "u16" "u32" "u64" "u128" "usize"
+    ;; Floating types
     "f32" "f64" "f128"
-    "bool"
 
-    "c_short"  "c_int"  "c_long"  "c_longlong"
-    "c_ushort" "c_uint" "c_ulong" "c_ulonglong"
-    "c_longdouble" "c_void"))
+    ;; C types
+    "c_short" "c_ushort" "c_int" "c_uint" "c_long" "c_ulong"
+    "c_longlong" "c_ulonglong" "c_longdouble" "c_void"
+
+    ;; Other types
+    "bool" "void" "noreturn" "type" "error" "promise"))
+
 
 (defconst zig-constants
-  '("null" "undefined" "this"
-    "true" "false"))
+  '(
+    ;; Boolean
+    "true" "false"
+
+    ;; Other constants
+    "null" "undefined" "this"))
+
 
 (defvar zig-font-lock-keywords
   (append
