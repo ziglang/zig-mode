@@ -1,6 +1,6 @@
 ;;; zig-mode.el --- A major mode for the Zig programming language -*- lexical-binding: t -*-
 
-;; Version: 0.0.3
+;; Version: 0.0.4
 ;; Author: Andrea Orru <andreaorru1991@gmail.com>, Andrew Kelley <superjoe30@gmail.com>
 ;; Keywords: zig, languages
 ;; Package-Requires: ((emacs "24"))
@@ -76,7 +76,7 @@
     "try" "catch" "async" "await" "suspend" "resume" "cancel"
 
     ;; Conditional
-    "if" "else" "switch" "and" "or"
+    "if" "else" "switch" "and" "or" "orelse"
 
     ;; Repeat
     "while" "for"
@@ -92,11 +92,14 @@
     "isize" "usize"
 
     ;; Floating types
-    "f32" "f64" "f128"
+    "f16" "f32" "f64" "f128"
 
     ;; C types
     "c_short" "c_ushort" "c_int" "c_uint" "c_long" "c_ulong"
     "c_longlong" "c_ulonglong" "c_longdouble" "c_void"
+
+    ;; Comptime types
+    "comptime_int" "comptime_float"
 
     ;; Other types
     "bool" "void" "noreturn" "type" "error" "promise"))
