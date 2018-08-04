@@ -1,6 +1,6 @@
 ;;; zig-mode.el --- A major mode for the Zig programming language -*- lexical-binding: t -*-
 
-;; Version: 0.0.6
+;; Version: 0.0.7
 ;; Author: Andrea Orru <andreaorru1991@gmail.com>, Andrew Kelley <superjoe30@gmail.com>
 ;; Keywords: zig, languages
 ;; Package-Requires: ((emacs "24"))
@@ -23,8 +23,6 @@
 ;;
 
 ;;; Code:
-
-(require 'cc-mode)
 
 (defun zig-re-word (inner)
   "Construct a regular expression for the word INNER."
@@ -104,7 +102,6 @@
     ;; Other types
     "bool" "void" "noreturn" "type" "error" "promise"))
 
-
 (defconst zig-constants
   '(
     ;; Boolean
@@ -113,6 +110,21 @@
     ;; Other constants
     "null" "undefined" "this"))
 
+(defgroup zig-mode nil
+  "Support for Zig code."
+  :link '(url-link "https://ziglang.org/")
+  :group 'languages)
+
+(defcustom zig-indent-offset 4
+  "Indent Zig code by this number of spaces."
+  :type 'integer
+  :group 'zig-mode
+  :safe #'integerp)
+
+(defface zig-multiline-string-face
+  '((t :inherit font-lock-string-face))
+  "Face for multiline string literals."
+  :group 'zig-mode)
 
 (defvar zig-font-lock-keywords
   (append
@@ -138,8 +150,47 @@
              ("var"   . font-lock-variable-name-face)
              ("fn"    . font-lock-function-name-face)))))
 
+(defun zig-paren-nesting-level () (nth 0 (syntax-ppss)))
+(defun zig-prev-open-paren-pos () (car (last (nth 9 (syntax-ppss)))))
 (defun zig-currently-in-str () (nth 3 (syntax-ppss)))
 (defun zig-start-of-current-str-or-comment () (nth 8 (syntax-ppss)))
+
+(defun zig-skip-backwards-past-whitespace-and-comments ()
+  (while (or
+          ;; If inside a comment, jump to start of comment.
+          (let ((start (zig-start-of-current-str-or-comment)))
+            (and start
+                 (not (zig-currently-in-str))
+                 (goto-char start)))
+          ;; Skip backwards past whitespace and comment end delimiters.
+          (/= 0 (skip-syntax-backward " >")))))
+
+(defun zig-mode-indent-line ()
+  (interactive)
+  (let ((indent-col
+         (save-excursion
+           (back-to-indentation)
+           (let ((paren-level
+                  (let ((level (zig-paren-nesting-level)))
+                    (if (looking-at "[]})]") (1- level) level))))
+             (+ (if (<= paren-level 0)
+                    0
+                  (or (save-excursion
+                        (goto-char (1+ (zig-prev-open-paren-pos)))
+                        (and (not (looking-at "\n"))
+                             (current-column)))
+                      (* zig-indent-offset paren-level)))
+                (if (and
+                     (not (looking-at ";"))
+                     (save-excursion
+                       (zig-skip-backwards-past-whitespace-and-comments)
+                       (when (> (point) 1)
+                         (backward-char)
+                         (not (looking-at "[,;([{}]")))))
+                     zig-indent-offset 0))))))
+    (if (<= (current-column) (current-indentation))
+        (indent-line-to indent-col)
+      (save-excursion (indent-line-to indent-col)))))
 
 (defun zig-syntax-propertize-newline-if-in-multiline-str (end)
   (when (and (zig-currently-in-str)
@@ -164,7 +215,12 @@
    (point) end))
 
 (defun zig-mode-syntactic-face-function (state)
-  (if (nth 3 state) 'font-lock-string-face
+  (if (nth 3 state)
+      (save-excursion
+        (goto-char (nth 8 state))
+        (if (looking-at "\\\\\\\\")
+            'zig-multiline-string-face
+          'font-lock-string-face))
     (save-excursion
       (goto-char (nth 8 state))
       (if (looking-at "///[^/]")
@@ -172,12 +228,12 @@
         'font-lock-comment-face))))
 
 ;;;###autoload
-(define-derived-mode zig-mode c-mode "Zig"
-  "A major mode for the zig programming language."
-  (set (make-local-variable 'c-basic-offset) 4)
-  (set (make-local-variable 'c-syntactic-indentation) nil)
+(define-derived-mode zig-mode prog-mode "Zig"
+  "A major mode for the Zig programming language."
   (setq-local comment-start "// ")
   (setq-local comment-end "")
+  (setq-local indent-line-function 'zig-mode-indent-line)
+  (setq-local indent-tabs-mode nil)  ; Zig forbids tab characters.
   (setq-local syntax-propertize-function 'zig-syntax-propertize)
   (setq font-lock-defaults '(zig-font-lock-keywords
                              nil nil nil nil
