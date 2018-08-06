@@ -1,6 +1,6 @@
 ;;; zig-mode.el --- A major mode for the Zig programming language -*- lexical-binding: t -*-
 
-;; Version: 0.0.4
+;; Version: 0.0.5
 ;; Author: Andrea Orru <andreaorru1991@gmail.com>, Andrew Kelley <superjoe30@gmail.com>
 ;; Keywords: zig, languages
 ;; Package-Requires: ((emacs "24"))
@@ -142,6 +142,7 @@
 (define-derived-mode zig-mode c-mode "Zig"
   "A major mode for the zig programming language."
   (set (make-local-variable 'c-basic-offset) 4)
+  (set (make-local-variable 'c-syntactic-indentation) nil)
   (setq font-lock-defaults '(zig-font-lock-keywords)))
 
 ;;;###autoload
