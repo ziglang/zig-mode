@@ -138,6 +138,31 @@
              ("var"   . font-lock-variable-name-face)
              ("fn"    . font-lock-function-name-face)))))
 
+(defun zig-currently-in-str () (nth 3 (syntax-ppss)))
+(defun zig-start-of-current-str-or-comment () (nth 8 (syntax-ppss)))
+
+(defun zig-syntax-propertize-newline-if-in-multiline-str (end)
+  (when (and (zig-currently-in-str)
+             (save-excursion
+               (goto-char (zig-start-of-current-str-or-comment))
+               (looking-at "\\\\\\\\"))
+             (re-search-forward "\n" end t))
+    (put-text-property (match-beginning 0) (match-end 0)
+                       'syntax-table (string-to-syntax "|"))
+    (goto-char (match-end 0))))
+
+(defun zig-syntax-propertize (start end)
+  (goto-char start)
+  (zig-syntax-propertize-newline-if-in-multiline-str end)
+  (funcall
+   (syntax-propertize-rules
+    ;; Multiline strings
+    ("\\(\\\\\\)\\\\"
+     (1 (prog1 "|"
+	  (goto-char (match-end 0))
+	  (zig-syntax-propertize-newline-if-in-multiline-str end)))))
+   (point) end))
+
 ;;;###autoload
 (define-derived-mode zig-mode c-mode "Zig"
   "A major mode for the zig programming language."
@@ -145,6 +170,7 @@
   (set (make-local-variable 'c-syntactic-indentation) nil)
   (setq-local comment-start "// ")
   (setq-local comment-end "")
+  (setq-local syntax-propertize-function 'zig-syntax-propertize)
   (setq font-lock-defaults '(zig-font-lock-keywords)))
 
 ;;;###autoload
