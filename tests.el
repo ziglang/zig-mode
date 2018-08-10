@@ -4,6 +4,93 @@
 (require 'zig-mode)
 
 ;;===========================================================================;;
+;; Font lock tests
+
+(defun zig-test-font-lock (code expected)
+  (let* ((fontified-code
+          (with-temp-buffer
+            (zig-mode)
+            (insert code)
+            (font-lock-fontify-buffer)
+            (buffer-string)))
+         (start 0)
+         (actual '()))
+    (while start
+      (let* ((end (next-single-property-change start 'face fontified-code))
+             (substring (substring-no-properties fontified-code start end))
+             (face (get-text-property start 'face fontified-code)))
+        (when face
+          (setq actual (cons (list substring face) actual)))
+        (setq start end)))
+    (should (equal expected (reverse actual)))))
+
+(ert-deftest test-font-lock-backslash-in-char-literal ()
+  (zig-test-font-lock
+   "const escaped = '\\'';"
+   '(("const" font-lock-keyword-face)
+     ("escaped" font-lock-variable-name-face)
+     ("'\\''" font-lock-string-face))))
+
+(ert-deftest test-font-lock-backslash-in-str-literal ()
+  (zig-test-font-lock
+   "\"This quote \\\" is escaped\""
+   '(("\"This quote \\\" is escaped\"" font-lock-string-face))))
+
+(ert-deftest test-font-lock-builtins ()
+  (zig-test-font-lock
+   "const std = @import(\"std\");"
+   '(("const" font-lock-keyword-face)
+     ("std" font-lock-variable-name-face)
+     ("@import" font-lock-builtin-face)
+     ("\"std\"" font-lock-string-face))))
+
+(ert-deftest test-font-lock-comments ()
+  (zig-test-font-lock
+   "
+// This is a normal comment\n
+/// This is a doc comment\n
+//// This is a normal comment again\n"
+   '(("// This is a normal comment\n" font-lock-comment-face)
+     ("/// This is a doc comment\n" font-lock-doc-face)
+     ("//// This is a normal comment again\n" font-lock-comment-face))))
+
+(ert-deftest test-font-lock-decl-const ()
+  (zig-test-font-lock
+   "const greeting = \"Hello, world!\";"
+   '(("const" font-lock-keyword-face)
+     ("greeting" font-lock-variable-name-face)
+     ("\"Hello, world!\"" font-lock-string-face))))
+
+(ert-deftest test-font-lock-decl-fn ()
+  (zig-test-font-lock
+   "fn plus1(value: u32) u32 { return value + 1; }"
+   '(("fn" font-lock-keyword-face)
+     ("plus1" font-lock-function-name-face)
+     ("value" font-lock-variable-name-face)
+     ("u32" font-lock-type-face)
+     ("u32" font-lock-type-face)
+     ("return" font-lock-keyword-face))))
+
+(ert-deftest test-font-lock-decl-var ()
+  (zig-test-font-lock
+   "var finished = false;"
+   '(("var" font-lock-keyword-face)
+     ("finished" font-lock-variable-name-face)
+     ("false" font-lock-constant-face))))
+
+(ert-deftest test-font-lock-multiline-str-literal ()
+  (zig-test-font-lock
+   "
+const python =
+    \\\\def main():
+    \\\\    print(\"Hello, world!\")
+;"
+   '(("const" font-lock-keyword-face)
+     ("python" font-lock-variable-name-face)
+     ("\\\\def main():\n" zig-multiline-string-face)
+     ("\\\\    print(\"Hello, world!\")\n" zig-multiline-string-face))))
+
+;;===========================================================================;;
 ;; Indentation tests
 
 (defun zig-test-indent-region (original expected)
