@@ -1,6 +1,6 @@
 ;;; zig-mode.el --- A major mode for the Zig programming language -*- lexical-binding: t -*-
 
-;; Version: 0.0.5
+;; Version: 0.0.6
 ;; Author: Andrea Orru <andreaorru1991@gmail.com>, Andrew Kelley <superjoe30@gmail.com>
 ;; Keywords: zig, languages
 ;; Package-Requires: ((emacs "24"))
@@ -163,6 +163,14 @@
 	  (zig-syntax-propertize-newline-if-in-multiline-str end)))))
    (point) end))
 
+(defun zig-mode-syntactic-face-function (state)
+  (if (nth 3 state) 'font-lock-string-face
+    (save-excursion
+      (goto-char (nth 8 state))
+      (if (looking-at "///[^/]")
+          'font-lock-doc-face
+        'font-lock-comment-face))))
+
 ;;;###autoload
 (define-derived-mode zig-mode c-mode "Zig"
   "A major mode for the zig programming language."
@@ -171,7 +179,10 @@
   (setq-local comment-start "// ")
   (setq-local comment-end "")
   (setq-local syntax-propertize-function 'zig-syntax-propertize)
-  (setq font-lock-defaults '(zig-font-lock-keywords)))
+  (setq font-lock-defaults '(zig-font-lock-keywords
+                             nil nil nil nil
+                             (font-lock-syntactic-face-function
+                              . zig-mode-syntactic-face-function))))
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.zig\\'" . zig-mode))
