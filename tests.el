@@ -31,6 +31,16 @@
      ("escaped" font-lock-variable-name-face)
      ("'\\''" font-lock-string-face))))
 
+(ert-deftest test-font-lock-backslash-in-multiline-str-literal ()
+  (zig-test-font-lock
+   "
+const string =
+    \\\\ This newline is NOT escaped \\
+;"
+   '(("const" font-lock-keyword-face)
+     ("string" font-lock-variable-name-face)
+     ("\\\\ This newline is NOT escaped \\\n" zig-multiline-string-face))))
+
 (ert-deftest test-font-lock-backslash-in-str-literal ()
   (zig-test-font-lock
    "\"This quote \\\" is escaped\""

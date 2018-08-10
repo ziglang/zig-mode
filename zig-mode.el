@@ -192,26 +192,50 @@
         (indent-line-to indent-col)
       (save-excursion (indent-line-to indent-col)))))
 
-(defun zig-syntax-propertize-newline-if-in-multiline-str (end)
-  (when (and (zig-currently-in-str)
-             (save-excursion
-               (goto-char (zig-start-of-current-str-or-comment))
-               (looking-at "\\\\\\\\"))
-             (re-search-forward "\n" end t))
-    (put-text-property (match-beginning 0) (match-end 0)
-                       'syntax-table (string-to-syntax "|"))
-    (goto-char (match-end 0))))
+(defun zig-syntax-propertize-to-newline-if-in-multiline-str (end)
+  ;; First, we need to check if we're in a multiline string literal; if we're
+  ;; not, do nothing.
+  (when (zig-currently-in-str)
+    (let ((start (zig-start-of-current-str-or-comment)))
+      (when (save-excursion
+              (goto-char start)
+              (looking-at "\\\\\\\\"))
+        ;; At this point, we've determined that we're within a multiline string
+        ;; literal.  Let `stop' be the position of the closing newline, or
+        ;; `end', whichever comes first.
+        (let ((stop (if (save-excursion
+                          (goto-char start)
+                          (re-search-forward "\n" end t))
+                        (prog1 (match-end 0)
+                          ;; We found the closing newline, so mark it as the
+                          ;; end of this string literal.
+                          (put-text-property (match-beginning 0)
+                                             (match-end 0)
+                                             'syntax-table
+                                             (string-to-syntax "|")))
+                      end)))
+          ;; Zig multiline string literals don't support escapes, so mark all
+          ;; backslashes (up to `stop') as punctation instead of escapes.
+          (save-excursion
+            (goto-char (+ 2 start))
+            (while (re-search-forward "\\\\" stop t)
+              (put-text-property (match-beginning 0) (match-end 0)
+                                 'syntax-table (string-to-syntax "."))
+              (goto-char (match-end 0))))
+          ;; Move to the end of the string (or `end'), so that
+          ;; zig-syntax-propertize can pick up from there.
+          (goto-char stop))))))
 
 (defun zig-syntax-propertize (start end)
   (goto-char start)
-  (zig-syntax-propertize-newline-if-in-multiline-str end)
+  (zig-syntax-propertize-to-newline-if-in-multiline-str end)
   (funcall
    (syntax-propertize-rules
     ;; Multiline strings
     ("\\(\\\\\\)\\\\"
      (1 (prog1 "|"
 	  (goto-char (match-end 0))
-	  (zig-syntax-propertize-newline-if-in-multiline-str end)))))
+	  (zig-syntax-propertize-to-newline-if-in-multiline-str end)))))
    (point) end))
 
 (defun zig-mode-syntactic-face-function (state)
