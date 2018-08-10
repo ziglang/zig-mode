@@ -143,6 +143,8 @@
   "A major mode for the zig programming language."
   (set (make-local-variable 'c-basic-offset) 4)
   (set (make-local-variable 'c-syntactic-indentation) nil)
+  (setq-local comment-start "// ")
+  (setq-local comment-end "")
   (setq font-lock-defaults '(zig-font-lock-keywords)))
 
 ;;;###autoload
