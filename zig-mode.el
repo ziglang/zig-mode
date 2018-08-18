@@ -1,6 +1,6 @@
 ;;; zig-mode.el --- A major mode for the Zig programming language -*- lexical-binding: t -*-
 
-;; Version: 0.0.7
+;; Version: 0.0.8
 ;; Author: Andrea Orru <andreaorru1991@gmail.com>, Andrew Kelley <superjoe30@gmail.com>
 ;; Keywords: zig, languages
 ;; Package-Requires: ((emacs "24"))
@@ -110,6 +110,9 @@
     ;; Other constants
     "null" "undefined" "this"))
 
+(defconst zig-electric-indent-chars
+  '( ?\; ?, ?) ?] ?} ))
+
 (defgroup zig-mode nil
   "Support for Zig code."
   :link '(url-link "https://ziglang.org/")
@@ -151,7 +154,6 @@
              ("fn"    . font-lock-function-name-face)))))
 
 (defun zig-paren-nesting-level () (nth 0 (syntax-ppss)))
-(defun zig-prev-open-paren-pos () (car (last (nth 9 (syntax-ppss)))))
 (defun zig-currently-in-str () (nth 3 (syntax-ppss)))
 (defun zig-start-of-current-str-or-comment () (nth 8 (syntax-ppss)))
 
@@ -167,27 +169,57 @@
 
 (defun zig-mode-indent-line ()
   (interactive)
+  ;; First, calculate the column that this line should be indented to.
   (let ((indent-col
          (save-excursion
            (back-to-indentation)
-           (let ((paren-level
-                  (let ((level (zig-paren-nesting-level)))
-                    (if (looking-at "[]})]") (1- level) level))))
-             (+ (if (<= paren-level 0)
-                    0
-                  (or (save-excursion
-                        (goto-char (1+ (zig-prev-open-paren-pos)))
-                        (and (not (looking-at "\n"))
-                             (current-column)))
-                      (* zig-indent-offset paren-level)))
-                (if (and
-                     (not (looking-at ";"))
+           (let* (;; paren-level: How many sets of parens (or other delimiters)
+                  ;;   we're within, except that if this line closes the
+                  ;;   innermost set(s) (e.g. the line is just "}"), then we
+                  ;;   don't count those set(s).
+                  (paren-level
+                   (save-excursion
+                     (while (looking-at "[]})]") (forward-char))
+                     (zig-paren-nesting-level)))
+                  ;; prev-block-indent-col: If we're within delimiters, this is
+                  ;; the column to which the start of that block is indented
+                  ;; (if we're not, this is just zero).
+                  (prev-block-indent-col
+                   (if (<= paren-level 0) 0
                      (save-excursion
-                       (zig-skip-backwards-past-whitespace-and-comments)
-                       (when (> (point) 1)
-                         (backward-char)
-                         (not (looking-at "[,;([{}]")))))
-                     zig-indent-offset 0))))))
+                       (while (>= (zig-paren-nesting-level) paren-level)
+                         (backward-up-list)
+                         (back-to-indentation))
+                       (current-column))))
+                  ;; base-indent-col: The column to which a complete expression
+                  ;;   on this line should be indented.
+                  (base-indent-col
+                   (if (<= paren-level 0)
+                       prev-block-indent-col
+                     (or (save-excursion
+                           (backward-up-list)
+                           (forward-char)
+                           (and (not (looking-at " *\\(//[^\n]*\\)?\n"))
+                                (current-column)))
+                         (+ prev-block-indent-col zig-indent-offset))))
+                  ;; is-expr-continutation: True if this line continues an
+                  ;; expression from the previous line, false otherwise.
+                  (is-expr-continutation
+                   (and
+                    (not (looking-at "[]});]"))
+                    (save-excursion
+                      (zig-skip-backwards-past-whitespace-and-comments)
+                      (when (> (point) 1)
+                        (backward-char)
+                        (not (looking-at "[,;([{}]")))))))
+             ;; Now we can calculate indent-col:
+             (if is-expr-continutation
+                 (+ base-indent-col zig-indent-offset)
+               base-indent-col)))))
+    ;; If point is within the indentation whitespace, move it to the end of the
+    ;; new indentation whitespace (which is what the indent-line-to function
+    ;; always does).  Otherwise, we don't want point to move, so we use a
+    ;; save-excursion.
     (if (<= (current-column) (current-indentation))
         (indent-line-to indent-col)
       (save-excursion (indent-line-to indent-col)))))
@@ -256,6 +288,10 @@
   "A major mode for the Zig programming language."
   (setq-local comment-start "// ")
   (setq-local comment-end "")
+  (setq-local electric-indent-chars
+              (append zig-electric-indent-chars
+                      (and (boundp 'electric-indent-chars)
+                           electric-indent-chars)))
   (setq-local indent-line-function 'zig-mode-indent-line)
   (setq-local indent-tabs-mode nil)  ; Zig forbids tab characters.
   (setq-local syntax-propertize-function 'zig-syntax-propertize)

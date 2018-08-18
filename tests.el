@@ -103,6 +103,29 @@ const python =
 ;;===========================================================================;;
 ;; Indentation tests
 
+(defun zig-test-indent-line (line-number original expected-line)
+  (with-temp-buffer
+    (zig-mode)
+    (insert original)
+    (goto-line line-number)
+    (indent-for-tab-command)
+    (let* ((current-line (thing-at-point 'line t))
+           (stripped-line (replace-regexp-in-string "\n\\'" "" current-line)))
+      (should (equal expected-line stripped-line)))))
+
+(ert-deftest test-indent-from-current-block ()
+  (zig-test-indent-line
+   6
+   "
+{
+  // Normally, zig-mode indents to 4, but suppose
+  // someone indented this part to 2 for some reason.
+  {
+    // This line should get indented to 6, not 8.
+  }
+}"
+   "      // This line should get indented to 6, not 8."))
+
 (defun zig-test-indent-region (original expected)
   (with-temp-buffer
     (zig-mode)
@@ -230,5 +253,38 @@ const msg = []u8{'h', 'e', 'l', 'l', 'o',
    "
 const msg = []u8{'h', 'e', 'l', 'l', 'o',
                  'w', 'o', 'r', 'l', 'd'};"))
+
+(ert-deftest test-indent-paren-block ()
+  (zig-test-indent-region
+   "
+const foo = (
+some_very_long + expression_that_is * set_off_in_parens
+);"
+   "
+const foo = (
+    some_very_long + expression_that_is * set_off_in_parens
+);"))
+
+(ert-deftest test-indent-double-paren-block ()
+  (zig-test-indent-region
+   "
+const foo = ((
+this_expression_is + set_off_in_double_parens * for_some_reason
+));"
+   "
+const foo = ((
+    this_expression_is + set_off_in_double_parens * for_some_reason
+));"))
+
+(ert-deftest test-indent-with-comment-after-open-brace ()
+  (zig-test-indent-region
+   "
+if (false) { // This comment shouldn't mess anything up.
+launchTheMissiles();
+}"
+   "
+if (false) { // This comment shouldn't mess anything up.
+    launchTheMissiles();
+}"))
 
 ;;===========================================================================;;
