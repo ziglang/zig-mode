@@ -1,0 +1,6 @@
+image: ubuntu
+install:
+- sudo apt-get install emacs24
+build: off
+test_script:
+- ./run_tests.sh
