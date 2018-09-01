@@ -20,3 +20,29 @@ Alternatively, you can `git clone` the `zig-mode` repository somewhere
   (autoload 'zig-mode "zig-mode" nil t)
   (add-to-list 'auto-mode-alist '("\\.zig\\'" . zig-mode)))
 ```
+
+## Testing
+
+[![Build status](https://ci.appveyor.com/api/projects/status/u78j130vv4l6v21t?svg=true)](https://ci.appveyor.com/project/mdsteele/zig-mode)
+
+To run all unit tests with `emacs`, run:
+
+```bash
+./run_tests.sh
+```
+
+Note that Emacs 24 or later is required.  If you need to specify which Emacs
+binary to use, you can do that by setting the `EMACS` environment variable,
+e.g.:
+
+```bash
+EMACS=/usr/bin/emacs24 ./run_tests.sh
+```
+
+## License
+
+`zig-mode` is distributed under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3, or (at your
+option) any later version.
+
+See the [LICENSE](LICENSE) file for details.
