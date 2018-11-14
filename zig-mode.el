@@ -100,7 +100,7 @@
     "comptime_int" "comptime_float"
 
     ;; Other types
-    "bool" "void" "noreturn" "type" "error" "promise"))
+    "bool" "void" "noreturn" "type" "error" "anyerror" "promise"))
 
 (defconst zig-constants
   '(
