@@ -64,7 +64,7 @@
   '(
     ;; Storage
     "const" "var" "extern" "packed" "export" "pub" "noalias" "inline"
-    "comptime" "nakedcc" "stdcallcc" "volatile" "align" "section"
+    "comptime" "nakedcc" "stdcallcc" "volatile" "align" "linksection"
 
     ;; Structure
     "struct" "enum" "union"
