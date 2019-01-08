@@ -2,6 +2,7 @@
 
 (require 'ert)
 (require 'zig-mode)
+(require 'imenu)
 
 ;;===========================================================================;;
 ;; Font lock tests
@@ -286,5 +287,71 @@ launchTheMissiles();
 if (false) { // This comment shouldn't mess anything up.
     launchTheMissiles();
 }"))
+
+;;===========================================================================;;
+;; Imenu tests
+
+;; taken from rust-mode
+(defun test-imenu (code expected-items)
+  (with-temp-buffer
+	(zig-mode)
+	(insert code)
+	(let ((actual-items
+		   ;; Replace ("item" . #<marker at ? in ?.el) with "item"
+		   (mapcar (lambda (class)
+					 (cons (car class)
+						   (mapcar #'car (cdr class))))
+				   (imenu--generic-function zig-imenu-generic-expression))))
+	  (should (equal expected-items actual-items)))))
+
+
+(ert-deftest test-imenu-struct ()
+  (test-imenu
+   "
+pub const Foo = struct {};
+pub const Bar = extern struct {};
+const FooBar = struct {};
+"
+   '(("Struct"
+	  "Foo"
+	  "Bar"
+	  "FooBar"))))
+
+(ert-deftest test-imenu-enum ()
+  (test-imenu
+   "
+pub const Foo = enum {};
+const FooBarError = enum {};
+"
+   '(("Enum"
+	  "Foo"
+	  "FooBarError"))))
+
+(ert-deftest test-imenu-enum ()
+  (test-imenu
+   "
+pub const Foo = enum {};
+const FooBarError = enum {};
+"
+   '(("Enum"
+	  "Foo"
+	  "FooBarError"))))
+
+(ert-deftest test-imenu-all ()
+  (test-imenu
+   "
+const Foo = struct {
+	pub fn init() void {}
+};
+
+const FooError = enum {};
+
+pub fn main() void {
+}
+"
+   '(("Fn" "init" "main")
+	 ("Struct" "Foo")
+	 ("Enum" "FooError"))))
+
 
 ;;===========================================================================;;
