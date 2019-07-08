@@ -111,7 +111,7 @@
     "null" "undefined" "this"))
 
 (defconst zig-electric-indent-chars
-  '( ?\; ?, ?) ?] ?} ))
+  '(?\; ?, ?\) ?\] ?}))
 
 (defgroup zig-mode nil
   "Support for Zig code."
