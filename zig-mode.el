@@ -20,7 +20,10 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-;;
+
+;; A major mode for the Zig programming languages.
+
+;; See documentation on https://github.com/zig-lang/zig-mode
 
 ;;; Code:
 
