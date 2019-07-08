@@ -266,8 +266,8 @@
     ;; Multiline strings
     ("\\(\\\\\\)\\\\"
      (1 (prog1 "|"
-	  (goto-char (match-end 0))
-	  (zig-syntax-propertize-to-newline-if-in-multiline-str end)))))
+          (goto-char (match-end 0))
+          (zig-syntax-propertize-to-newline-if-in-multiline-str end)))))
    (point) end))
 
 (defun zig-mode-syntactic-face-function (state)
@@ -287,15 +287,15 @@
 (defun zig-re-structure-def-imenu (stype)
   "Construct a regular expression for strucutres definitions of type STYPE."
   (concat (zig-re-word "const") "[[:space:]]+"
-		  (zig-re-grab zig-re-identifier)
-		  ".*"
-		  (zig-re-word stype)))
+          (zig-re-grab zig-re-identifier)
+          ".*"
+          (zig-re-word stype)))
 
 (defvar zig-imenu-generic-expression
   (append (mapcar #'(lambda (x)
-					  (list (capitalize x) (zig-re-structure-def-imenu x) 1))
-				  '("enum" "struct" "union"))
-		  `(("Fn" ,(zig-re-definition "fn") 1))))
+                      (list (capitalize x) (zig-re-structure-def-imenu x) 1))
+                  '("enum" "struct" "union"))
+          `(("Fn" ,(zig-re-definition "fn") 1))))
 
 ;;;###autoload
 (define-derived-mode zig-mode prog-mode "Zig"
