@@ -146,9 +146,9 @@
      )
 
    ;; Definitions
-   (mapcar #'(lambda (x)
-               (list (zig-re-definition (car x))
-                     1 (cdr x)))
+   (mapcar (lambda (x)
+             (list (zig-re-definition (car x))
+                   1 (cdr x)))
            '(("const" . font-lock-variable-name-face)
              ("var"   . font-lock-variable-name-face)
              ("fn"    . font-lock-function-name-face)))))
@@ -292,8 +292,8 @@
           (zig-re-word stype)))
 
 (defvar zig-imenu-generic-expression
-  (append (mapcar #'(lambda (x)
-                      (list (capitalize x) (zig-re-structure-def-imenu x) 1))
+  (append (mapcar (lambda (x)
+                    (list (capitalize x) (zig-re-structure-def-imenu x) 1))
                   '("enum" "struct" "union"))
           `(("Fn" ,(zig-re-definition "fn") 1))))
 
