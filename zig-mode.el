@@ -3,7 +3,7 @@
 ;; Version: 0.0.8
 ;; Author: Andrea Orru <andreaorru1991@gmail.com>, Andrew Kelley <superjoe30@gmail.com>
 ;; Keywords: zig, languages
-;; Package-Requires: ((emacs "24"))
+;; Package-Requires: ((emacs "24.3"))
 ;; URL: https://github.com/zig-lang/zig-mode
 
 ;; This file is free software; you can redistribute it and/or modify
