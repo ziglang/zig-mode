@@ -64,14 +64,15 @@
   '(
     ;; Storage
     "const" "var" "extern" "packed" "export" "pub" "noalias" "inline"
-    "comptime" "nakedcc" "stdcallcc" "volatile" "align" "linksection"
+    "noinline" "comptime" "nakedcc" "stdcallcc" "volatile" "allowzero"
+    "align" "linksection" "threadlocal"
 
     ;; Structure
-    "struct" "enum" "union"
+    "struct" "enum" "union" "error"
 
     ;; Statement
     "break" "return" "continue" "asm" "defer" "errdefer" "unreachable"
-    "try" "catch" "async" "await" "suspend" "resume" "cancel"
+    "try" "catch" "async" "noasync" "await" "suspend" "resume"
 
     ;; Conditional
     "if" "else" "switch" "and" "or" "orelse"
@@ -80,7 +81,7 @@
     "while" "for"
 
     ;; Other keywords
-    "fn" "use" "test"))
+    "fn" "usingnamespace" "test"))
 
 (defconst zig-types
   '(
