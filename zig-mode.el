@@ -24,6 +24,16 @@
 
 ;;; Code:
 
+(defgroup zig-mode nil
+  "Support for Zig code."
+  :link '(url-link "https://ziglang.org/")
+  :group 'languages)
+
+(defcustom zig-indent-offset 4
+  "Indent Zig code by this number of spaces."
+  :type 'integer
+  :group 'zig-mode
+  :safe #'integerp)
 (defun zig-re-word (inner)
   "Construct a regular expression for the word INNER."
   (concat "\\<" inner "\\>"))
@@ -114,16 +124,6 @@
 (defconst zig-electric-indent-chars
   '( ?\; ?, ?) ?] ?} ))
 
-(defgroup zig-mode nil
-  "Support for Zig code."
-  :link '(url-link "https://ziglang.org/")
-  :group 'languages)
-
-(defcustom zig-indent-offset 4
-  "Indent Zig code by this number of spaces."
-  :type 'integer
-  :group 'zig-mode
-  :safe #'integerp)
 
 (defface zig-multiline-string-face
   '((t :inherit font-lock-string-face))
