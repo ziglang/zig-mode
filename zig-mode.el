@@ -49,7 +49,6 @@
 
 ;; zig CLI commands
 
-
 (defun zig--run-cmd (cmd &optional source &rest args)
   "Use compile command to execute a zig CMD with ARGS if given.
 If given a SOURCE, execute the CMD on it."
@@ -388,9 +387,21 @@ If given a SOURCE, execute the CMD on it."
 				  '("enum" "struct" "union"))
 		  `(("Fn" ,(zig-re-definition "fn") 1))))
 
+(defvar zig-mode-map
+  (let ((map (make-sparse-keymap)))
+	(define-key map (kbd "C-c C-b") 'zig-compile)
+	(define-key map (kbd "C-c C-f") 'zig-format-buffer)
+	(define-key map (kbd "C-c C-r") 'zig-run)
+	(define-key map (kbd "C-c C-t") 'zig-test-buffer)
+	map)
+  "Keymap for Zig major mode.")
+
 ;;;###autoload
 (define-derived-mode zig-mode prog-mode "Zig"
-  "A major mode for the Zig programming language."
+  "A major mode for the Zig programming language.
+
+\\{zig-mode-map}"
+  :group 'zig-mode
   (setq-local comment-start "// ")
   (setq-local comment-end "")
   (setq-local electric-indent-chars
