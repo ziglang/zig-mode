@@ -49,14 +49,59 @@
 
 ;; zig CLI commands
 
+
+(defun zig--run-cmd (cmd &optional source &rest args)
+  "Use compile command to execute a zig CMD with ARGS if given.
+If given a SOURCE, execute the CMD on it."
+  (let ((cmd-args
+         (if source
+             (mapconcat 'identity (cons source args) " ")
+           args)))
+    (compile (concat zig-zig-bin " " cmd " " cmd-args))))
+
 ;;;###autoload
 (defun zig-toggle-format-on-save ()
   "Switch format before save on current buffer."
   (interactive)
   (if zig-format-on-save
-	  (setq-local zig-format-on-save nil)
-	(setq-local zig-format-on-save t)))
+      (setq-local zig-format-on-save nil)
+    (setq-local zig-format-on-save t)))
 
+;;;###autoload
+(defun zig-compile ()
+  "Compile using `zig build`."
+  (interactive)
+  (zig--run-cmd "build"))
+
+;;;###autoload
+(defun zig-build-exe ()
+  "Create executable from source or object file."
+  (interactive)
+  (zig--run-cmd "build-exe" (buffer-file-name)))
+
+;;;###autoload
+(defun zig-build-lib ()
+  "Create library from source or assembly."
+  (interactive)
+  (zig--run-cmd "build-lib" (buffer-file-name)))
+
+;;;###autoload
+(defun zig-build-obj ()
+  "Create object from source or assembly."
+  (interactive)
+  (zig--run-cmd "build-obj" (buffer-file-name)))
+
+;;;###autoload
+(defun zig-test-buffer ()
+  "Test buffer using `zig test`."
+  (interactive)
+  (zig--run-cmd "test" (buffer-file-name) "--release-fast"))
+
+;;;###autoload
+(defun zig-run ()
+  "Create an executable from the current buffer and run it immediately."
+  (interactive)
+  (zig--run-cmd "run" (buffer-file-name)))
 
 ;;;###autoload
 (defun zig-format-buffer ()
