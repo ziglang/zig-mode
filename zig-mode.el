@@ -34,6 +34,51 @@
   :type 'integer
   :group 'zig-mode
   :safe #'integerp)
+
+(defcustom zig-format-on-save t
+  "Format buffers before saving using zig fmt."
+  :type 'boolean
+  :safe #'booleanp
+  :group 'zig-mode)
+
+(defcustom zig-zig-bin "zig"
+  "Path to zig executable."
+  :type 'string
+  :safe #'stringp
+  :group 'zig-mode)
+
+;; zig CLI commands
+
+;;;###autoload
+(defun zig-toggle-format-on-save ()
+  "Switch format before save on current buffer."
+  (interactive)
+  (if zig-format-on-save
+	  (setq-local zig-format-on-save nil)
+	(setq-local zig-format-on-save t)))
+
+
+;;;###autoload
+(defun zig-format-buffer ()
+  "Format the current buffer using the zig fmt."
+  (interactive)
+  (let ((fmt-buffer-name "*zig-fmt*"))
+	;; If we have an old *zig-fmt* buffer, we want to kill
+	;; it and start a new one to show the new errors
+	(when (get-buffer fmt-buffer-name)
+	  (kill-buffer fmt-buffer-name))
+	(let ((fmt-buffer (get-buffer-create fmt-buffer-name)))
+	  (set-process-sentinel
+	   (start-process "zig-fmt"
+					  fmt-buffer
+					  zig-zig-bin
+					  "fmt"
+					  (buffer-file-name))
+	   (lambda (process _e)
+		 (when (> (process-exit-status process) 0)
+		   (switch-to-buffer-other-window fmt-buffer)
+		   (compilation-mode)))))))
+
 (defun zig-re-word (inner)
   "Construct a regular expression for the word INNER."
   (concat "\\<" inner "\\>"))
@@ -313,9 +358,13 @@
   (setq-local imenu-generic-expression zig-imenu-generic-expression)
   (setq font-lock-defaults '(zig-font-lock-keywords
                              nil nil nil nil
-                             (font-lock-syntactic-face-function
-                              . zig-mode-syntactic-face-function))))
+                             (font-lock-syntactic-face-function . zig-mode-syntactic-face-function)))
 
+  (add-hook 'before-save-hook 'zig-before-save-hook nil t))
+
+(defun zig-before-save-hook ()
+  (when zig-format-on-save
+	(zig-format-buffer)))
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.zig\\'" . zig-mode))
 
