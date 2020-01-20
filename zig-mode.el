@@ -64,7 +64,7 @@
   '(
     ;; Storage
     "const" "var" "extern" "packed" "export" "pub" "noalias" "inline"
-    "noinline" "comptime" "nakedcc" "stdcallcc" "volatile" "allowzero"
+    "noinline" "comptime" "callconv" "volatile" "allowzero"
     "align" "linksection" "threadlocal"
 
     ;; Structure
