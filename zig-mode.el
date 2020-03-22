@@ -3,8 +3,8 @@
 ;; Version: 0.0.8
 ;; Author: Andrea Orru <andreaorru1991@gmail.com>, Andrew Kelley <superjoe30@gmail.com>
 ;; Keywords: zig, languages
-;; Package-Requires: ((emacs "24"))
-;; URL: https://github.com/zig-lang/zig-mode
+;; Package-Requires: ((emacs "24.3"))
+;; Homepage: https://github.com/zig-lang/zig-mode
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -20,7 +20,10 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-;;
+
+;; A major mode for the Zig programming languages.
+
+;; See documentation on https://github.com/zig-lang/zig-mode
 
 ;;; Code:
 
@@ -112,7 +115,7 @@
     "null" "undefined" "this"))
 
 (defconst zig-electric-indent-chars
-  '( ?\; ?, ?) ?] ?} ))
+  '(?\; ?, ?\) ?\] ?}))
 
 (defgroup zig-mode nil
   "Support for Zig code."
@@ -147,9 +150,9 @@
      )
 
    ;; Definitions
-   (mapcar #'(lambda (x)
-               (list (zig-re-definition (car x))
-                     1 (cdr x)))
+   (mapcar (lambda (x)
+             (list (zig-re-definition (car x))
+                   1 (cdr x)))
            '(("const" . font-lock-variable-name-face)
              ("var"   . font-lock-variable-name-face)
              ("fn"    . font-lock-function-name-face)))))
@@ -267,8 +270,8 @@
     ;; Multiline strings
     ("\\(\\\\\\)\\\\"
      (1 (prog1 "|"
-	  (goto-char (match-end 0))
-	  (zig-syntax-propertize-to-newline-if-in-multiline-str end)))))
+          (goto-char (match-end 0))
+          (zig-syntax-propertize-to-newline-if-in-multiline-str end)))))
    (point) end))
 
 (defun zig-mode-syntactic-face-function (state)
@@ -288,15 +291,15 @@
 (defun zig-re-structure-def-imenu (stype)
   "Construct a regular expression for strucutres definitions of type STYPE."
   (concat (zig-re-word "const") "[[:space:]]+"
-		  (zig-re-grab zig-re-identifier)
-		  ".*"
-		  (zig-re-word stype)))
+          (zig-re-grab zig-re-identifier)
+          ".*"
+          (zig-re-word stype)))
 
 (defvar zig-imenu-generic-expression
-  (append (mapcar #'(lambda (x)
-					  (list (capitalize x) (zig-re-structure-def-imenu x) 1))
-				  '("enum" "struct" "union"))
-		  `(("Fn" ,(zig-re-definition "fn") 1))))
+  (append (mapcar (lambda (x)
+                    (list (capitalize x) (zig-re-structure-def-imenu x) 1))
+                  '("enum" "struct" "union"))
+          `(("Fn" ,(zig-re-definition "fn") 1))))
 
 ;;;###autoload
 (define-derived-mode zig-mode prog-mode "Zig"
