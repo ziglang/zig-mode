@@ -268,7 +268,9 @@
   (funcall
    (syntax-propertize-rules
     ;; Multiline strings
-    ("\\(\\\\\\)\\\\"
+    ;; Do not match backslashes that are preceded by single or
+    ;; double-quotes.
+    ("[^\\'\"]c?\\(\\\\\\)\\\\"
      (1 (prog1 "|"
           (goto-char (match-end 0))
           (zig-syntax-propertize-to-newline-if-in-multiline-str end)))))
