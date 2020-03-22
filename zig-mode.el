@@ -303,6 +303,16 @@
                   '("enum" "struct" "union"))
           `(("Fn" ,(zig-re-definition "fn") 1))))
 
+;;; Guarantee filesystem unix line endings
+(defun zig-file-coding-system ()
+  (with-current-buffer (current-buffer)
+    (if (string-match "\\.d?zig\\'" buffer-file-name)
+        (setq buffer-file-coding-system 'utf-8-unix)
+      nil)
+))
+
+(add-hook 'zig-mode-hook 'zig-file-coding-system)
+
 ;;;###autoload
 (define-derived-mode zig-mode prog-mode "Zig"
   "A major mode for the Zig programming language."
