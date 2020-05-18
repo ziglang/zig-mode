@@ -203,7 +203,7 @@ If given a SOURCE, execute the CMD on it."
     "comptime_int" "comptime_float"
 
     ;; Other types
-    "bool" "void" "noreturn" "type" "error" "anyerror" "promise"))
+    "bool" "void" "noreturn" "type" "error" "anyerror" "anyframe"))
 
 (defconst zig-constants
   '(
