@@ -122,9 +122,11 @@ If given a SOURCE, execute the CMD on it."
 					  "fmt"
 					  (buffer-file-name))
 	   (lambda (process _e)
-		 (when (> (process-exit-status process) 0)
-		   (switch-to-buffer-other-window fmt-buffer)
-		   (compilation-mode)))))))
+		 (if (> (process-exit-status process) 0)
+		     (progn
+			 (switch-to-buffer-other-window fmt-buffer)
+			 (compilation-mode))
+		   (revert-buffer :ignore-auto :noconfirm)))))))
 
 (defun zig-re-word (inner)
   "Construct a regular expression for the word INNER."
