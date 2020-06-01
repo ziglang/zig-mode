@@ -176,7 +176,7 @@ If given a SOURCE, execute the CMD on it."
 
     ;; Statement
     "break" "return" "continue" "asm" "defer" "errdefer" "unreachable"
-    "try" "catch" "async" "noasync" "await" "suspend" "resume"
+    "try" "catch" "async" "nosuspend" "await" "suspend" "resume"
 
     ;; Conditional
     "if" "else" "switch" "and" "or" "orelse"
