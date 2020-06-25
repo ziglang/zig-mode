@@ -376,7 +376,7 @@ If given a SOURCE, execute the CMD on it."
           'font-lock-string-face))
     (save-excursion
       (goto-char (nth 8 state))
-      (if (looking-at "///[^/]")
+      (if (looking-at "//[/|!][^/]")
           'font-lock-doc-face
         'font-lock-comment-face))))
 
