@@ -397,9 +397,10 @@ If given a SOURCE, execute the CMD on it."
 ;;; Guarantee filesystem unix line endings
 (defun zig-file-coding-system ()
   (with-current-buffer (current-buffer)
-    (if (string-match "\\.d?zig\\'" buffer-file-name)
-        (setq buffer-file-coding-system 'utf-8-unix)
-      nil)
+    (if (buffer-file-name)
+        (if (string-match "\\.d?zig\\'" buffer-file-name)
+            (setq buffer-file-coding-system 'utf-8-unix)
+          nil))
 ))
 
 (add-hook 'zig-mode-hook 'zig-file-coding-system)
