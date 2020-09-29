@@ -57,7 +57,7 @@
 If given a SOURCE, execute the CMD on it."
   (let ((cmd-args
          (if source
-             (mapconcat 'identity (cons source args) " ")
+             (mapconcat 'shell-quote-argument (cons source args) " ")
            args)))
     (compile (concat zig-zig-bin " " cmd " " cmd-args))))
 
