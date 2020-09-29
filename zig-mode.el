@@ -110,23 +110,23 @@ If given a SOURCE, execute the CMD on it."
   "Format the current buffer using the zig fmt."
   (interactive)
   (let ((fmt-buffer-name "*zig-fmt*"))
-	;; If we have an old *zig-fmt* buffer, we want to kill
-	;; it and start a new one to show the new errors
-	(when (get-buffer fmt-buffer-name)
-	  (kill-buffer fmt-buffer-name))
-	(let ((fmt-buffer (get-buffer-create fmt-buffer-name)))
-	  (set-process-sentinel
-	   (start-process "zig-fmt"
-					  fmt-buffer
-					  zig-zig-bin
-					  "fmt"
-					  (buffer-file-name))
-	   (lambda (process _e)
-		 (if (> (process-exit-status process) 0)
-		     (progn
-			 (switch-to-buffer-other-window fmt-buffer)
-			 (compilation-mode))
-		   (revert-buffer :ignore-auto :noconfirm)))))))
+    ;; If we have an old *zig-fmt* buffer, we want to kill
+    ;; it and start a new one to show the new errors
+    (when (get-buffer fmt-buffer-name)
+      (kill-buffer fmt-buffer-name))
+    (let ((fmt-buffer (get-buffer-create fmt-buffer-name)))
+      (set-process-sentinel
+       (start-process "zig-fmt"
+                      fmt-buffer
+                      zig-zig-bin
+                      "fmt"
+                      (buffer-file-name))
+       (lambda (process _e)
+         (if (> (process-exit-status process) 0)
+             (progn
+               (switch-to-buffer-other-window fmt-buffer)
+               (compilation-mode))
+           (revert-buffer :ignore-auto :noconfirm)))))))
 
 (defun zig-re-word (inner)
   "Construct a regular expression for the word INNER."
