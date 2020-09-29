@@ -120,7 +120,9 @@ If given a SOURCE, execute the CMD on it."
                       fmt-buffer
                       zig-zig-bin
                       "fmt"
-                      (buffer-file-name))
+                      (if (eq system-type 'windows-nt)
+                          (subst-char-in-string ?/ ?\\ (buffer-file-name))
+                        (buffer-file-name)))
        (lambda (process _e)
          (if (> (process-exit-status process) 0)
              (progn
