@@ -213,7 +213,7 @@ If given a SOURCE, execute the CMD on it."
     "true" "false"
 
     ;; Other constants
-    "null" "undefined" "this"))
+    "null" "undefined"))
 
 (defconst zig-electric-indent-chars
   '(?\; ?, ?\) ?\] ?}))
