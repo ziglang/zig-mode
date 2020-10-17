@@ -134,20 +134,20 @@ If given a SOURCE, execute the CMD on it."
   (rx (any "_" word)
       (* (any "_" word digit))))
 
-(defconst zig-re-type
-  (rx (* (| "?" "[_]" "*" "[]"))
-      (regexp zig-re-identifier)))
-
 (defconst zig-re-type-annotation
-  (rx (group (regexp zig-re-identifier))
+  (rx (group (any "_" word)
+             (* (any "_" word digit)))
       (* (any space)) ":" (* (any space))
-      (group (regexp zig-re-type))))
+      (group (* (| "?" "[_]" "*" "[]"))
+             (any "_" word)
+             (* (any "_" word digit)))))
 
 (defun zig-re-definition (dtype)
   "Construct a regular expression for definitions of type DTYPE."
   (rx bow (literal dtype) eow
       (+ (any space))
-      (group (regexp zig-re-identifier))))
+      (group (any "_" word)
+             (* (any "_" word digit)))))
 
 (defconst zig-mode-syntax-table
   (let ((table (make-syntax-table)))
@@ -387,7 +387,8 @@ If given a SOURCE, execute the CMD on it."
 (defun zig-re-structure-def-imenu (stype)
   "Construct a regular expression for strucutres definitions of type STYPE."
   (rx bow "const" eow (+ (any space))
-      (group (regexp zig-re-identifier))
+      (group (any "_" word)
+             (* (any "_" word digit)))
       (* not-newline)
       bow (literal stype) eow))
 
