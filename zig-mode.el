@@ -130,24 +130,23 @@ If given a SOURCE, execute the CMD on it."
                (compilation-mode))
            (revert-buffer :ignore-auto :noconfirm)))))))
 
-(defconst zig-re-identifier
-  (rx (any "_" word)
-      (* (any "_" word digit))))
+(defun zig-re-word (inner)
+  "Construct a regular expression for the word INNER."
+  (concat "\\<" inner "\\>"))
 
-(defconst zig-re-type
-  (rx (* (| "?" "[_]" "*" "[]"))
-      (regexp zig-re-identifier)))
+(defun zig-re-grab (inner)
+  "Construct a group regular expression for INNER."
+  (concat "\\(" inner "\\)"))
 
+(defconst zig-re-identifier "[[:word:]_][[:word:]_[:digit:]]*")
 (defconst zig-re-type-annotation
-  (rx (group (regexp zig-re-identifier))
-      (* (any space)) ":" (* (any space))
-      (group (regexp zig-re-type))))
+  (concat (zig-re-grab zig-re-identifier)
+          "[[:space:]]*:[[:space:]]*"
+          (zig-re-grab zig-re-identifier)))
 
 (defun zig-re-definition (dtype)
   "Construct a regular expression for definitions of type DTYPE."
-  (rx bow (literal dtype) eow
-      (+ (any space))
-      (group (regexp zig-re-identifier))))
+  (concat (zig-re-word dtype) "[[:space:]]+" (zig-re-grab zig-re-identifier)))
 
 (defconst zig-mode-syntax-table
   (let ((table (make-syntax-table)))
@@ -386,10 +385,10 @@ If given a SOURCE, execute the CMD on it."
 ;;; Imenu support
 (defun zig-re-structure-def-imenu (stype)
   "Construct a regular expression for strucutres definitions of type STYPE."
-  (rx bow "const" eow (+ (any space))
-      (group (regexp zig-re-identifier))
-      (* not-newline)
-      bow (literal stype) eow))
+  (concat (zig-re-word "const") "[[:space:]]+"
+          (zig-re-grab zig-re-identifier)
+          ".*"
+          (zig-re-word stype)))
 
 (defvar zig-imenu-generic-expression
   (append (mapcar (lambda (x)
