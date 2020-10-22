@@ -347,7 +347,7 @@ If given a SOURCE, execute the CMD on it."
           ;; Zig multiline string literals don't support escapes, so mark all
           ;; backslashes (up to `stop') as punctation instead of escapes.
           (save-excursion
-            (goto-char (+ 2 start))
+            (goto-char (1+ start))
             (while (re-search-forward "\\\\" stop t)
               (put-text-property (match-beginning 0) (match-end 0)
                                  'syntax-table (string-to-syntax "."))
