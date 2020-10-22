@@ -97,7 +97,7 @@ If given a SOURCE, execute the CMD on it."
 (defun zig-test-buffer ()
   "Test buffer using `zig test`."
   (interactive)
-  (zig--run-cmd "test" (buffer-file-name) "--release-fast"))
+  (zig--run-cmd "test" (buffer-file-name) "-O" "ReleaseFast"))
 
 ;;;###autoload
 (defun zig-run ()
