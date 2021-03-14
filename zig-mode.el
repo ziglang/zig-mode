@@ -105,11 +105,15 @@ If given a SOURCE, execute the CMD on it."
   (interactive)
   (zig--run-cmd "run" (buffer-file-name)))
 
+(defvar zig-return-to-buffer-after-format nil
+  "Enable zig-format-buffer to return to file buffer after fmt is done.")
+
 ;;;###autoload
 (defun zig-format-buffer ()
   "Format the current buffer using the zig fmt."
   (interactive)
-  (let ((fmt-buffer-name "*zig-fmt*"))
+  (let ((fmt-buffer-name "*zig-fmt*")
+        (file-buffer (current-buffer)))
     ;; If we have an old *zig-fmt* buffer, we want to kill
     ;; it and start a new one to show the new errors
     (when (get-buffer fmt-buffer-name)
@@ -126,8 +130,10 @@ If given a SOURCE, execute the CMD on it."
        (lambda (process _e)
          (if (> (process-exit-status process) 0)
              (progn
-               (switch-to-buffer-other-window fmt-buffer)
-               (compilation-mode))
+               (pop-to-buffer fmt-buffer)
+               (compilation-mode)
+               (when zig-return-to-buffer-after-format
+                 (pop-to-buffer file-buffer)))
            (revert-buffer :ignore-auto :noconfirm)))))))
 
 (defun zig-re-word (inner)
