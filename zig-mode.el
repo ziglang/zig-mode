@@ -309,6 +309,12 @@ at the beginning of the defun body.
 
 This is written mainly to be used as `end-of-defun-function' for Zig."
   (interactive)
+  ;; Jump over the function parameters, if they exist.
+  (if (re-search-forward "(" (point-at-eol) t)
+      (progn
+        (backward-char)
+        (forward-sexp)))
+
   ;; Find the opening brace
   (if (re-search-forward "[{]" nil t)
       (progn
