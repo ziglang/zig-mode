@@ -269,8 +269,7 @@ If given a SOURCE, execute the CMD on it."
   (concat "^"
           (regexp-opt
            '("const" "pub" "fn" "extern" "export" "test"))
-          "[[:space:]]+"
-          ".*{")
+          "[[:space:]]+")
   "Start of a Zig item.")
 
 (defun zig-beginning-of-defun (&optional arg)
