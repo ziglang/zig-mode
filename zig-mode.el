@@ -309,8 +309,8 @@ at the beginning of the defun body.
 
 This is written mainly to be used as `end-of-defun-function' for Zig."
   (interactive)
-  ;; Jump over the function parameters, if they exist.
-  (if (re-search-forward "(" (point-at-eol) t)
+  ;; Jump over the function parameters and paren-wrapped return, if they exist.
+  (while (re-search-forward "(" (point-at-eol) t)
       (progn
         (backward-char)
         (forward-sexp)))
