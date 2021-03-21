@@ -50,6 +50,18 @@
   :safe #'stringp
   :group 'zig-mode)
 
+(defcustom zig-run-optimization-mode "Debug"
+  "Optimization mode to run code with."
+  :type 'string
+  :safe #'stringp
+  :group 'zig-mode)
+
+(defcustom zig-test-optimization-mode "Debug"
+  "Optimization mode to run tests with."
+  :type 'string
+  :safe #'stringp
+  :group 'zig-mode)
+
 ;; zig CLI commands
 
 (defun zig--run-cmd (cmd &optional source &rest args)
@@ -97,13 +109,13 @@ If given a SOURCE, execute the CMD on it."
 (defun zig-test-buffer ()
   "Test buffer using `zig test`."
   (interactive)
-  (zig--run-cmd "test" (buffer-file-name) "-O" "ReleaseFast"))
+  (zig--run-cmd "test" (buffer-file-name) "-O" zig-test-optimization-mode))
 
 ;;;###autoload
 (defun zig-run ()
   "Create an executable from the current buffer and run it immediately."
   (interactive)
-  (zig--run-cmd "run" (buffer-file-name)))
+  (zig--run-cmd "run" (buffer-file-name) "-O" zig-run-optimization-mode))
 
 ;;;###autoload
 (defun zig-format-buffer ()
