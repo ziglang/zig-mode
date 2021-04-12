@@ -31,7 +31,7 @@ To run all unit tests with `emacs`, run:
 ./run_tests.sh
 ```
 
-Note that Emacs 24 or later is required.  If you need to specify which Emacs
+Note that Emacs 24.3 or later is required.  If you need to specify which Emacs
 binary to use, you can do that by setting the `EMACS` environment variable,
 e.g.:
 

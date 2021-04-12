@@ -443,9 +443,9 @@ If given a SOURCE, execute the CMD on it."
 	(zig-format-buffer)))
 
 (defun colorize-compilation-buffer ()
-  (toggle-read-only)
+  (read-only-mode 0)
   (ansi-color-apply-on-region compilation-filter-start (point))
-  (toggle-read-only))
+  (read-only-mode 1))
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.zig\\'" . zig-mode))
