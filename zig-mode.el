@@ -266,9 +266,12 @@ If given a SOURCE, execute the CMD on it."
 
 (defun zig-in-str-or-cmnt () (nth 8 (syntax-ppss)))
 (defconst zig-top-item-beg-re
-  (concat "^"
+  (concat "^ *"
           (regexp-opt
-           '("const" "pub" "fn" "extern" "export" "test"))
+           '("pub" "extern" "export" ""))
+          "[[:space:]]*"
+          (regexp-opt
+           '("fn" "test"))
           "[[:space:]]+")
   "Start of a Zig item.")
 
@@ -290,13 +293,12 @@ This is written mainly to be used as `beginning-of-defun-function' for Zig."
     (catch 'done
       (dotimes (_ magnitude)
         ;; Search until we find a match that is not in a string or comment.
-        (while (if (re-search-backward (concat "^\\(" zig-top-item-beg-re "\\)")
+        (while (if (re-search-backward (concat "^[[:space:]]*\\(" zig-top-item-beg-re "\\)")
                                        nil 'move sign)
                    (zig-in-str-or-cmnt)
                  ;; Did not find it.
                  (throw 'done nil)))))
-    t)
-  (beginning-of-line))
+    t))
 
 (defun zig-end-of-defun ()
   "Move forward to the next end of defun.
@@ -309,11 +311,12 @@ at the beginning of the defun body.
 
 This is written mainly to be used as `end-of-defun-function' for Zig."
   (interactive)
+
   ;; Jump over the function parameters and paren-wrapped return, if they exist.
   (while (re-search-forward "(" (point-at-eol) t)
-      (progn
-        (backward-char)
-        (forward-sexp)))
+    (progn
+      (backward-char)
+      (forward-sexp)))
 
   ;; Find the opening brace
   (if (re-search-forward "[{]" nil t)
@@ -321,7 +324,7 @@ This is written mainly to be used as `end-of-defun-function' for Zig."
         (goto-char (match-beginning 0))
         ;; Go to the closing brace
         (condition-case nil
-             (forward-sexp)
+            (forward-sexp)
           (scan-error
            ;; The parentheses are unbalanced; instead of being unable
            ;; to fontify, just jump to the end of the buffer
