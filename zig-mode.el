@@ -192,7 +192,7 @@ If given a SOURCE, execute the CMD on it."
     "align" "linksection" "threadlocal"
 
     ;; Structure
-    "struct" "enum" "union" "error"
+    "struct" "enum" "union" "error" "opaque"
 
     ;; Statement
     "break" "return" "continue" "asm" "defer" "errdefer" "unreachable"
