@@ -101,6 +101,18 @@ const python =
      ("\\\\def main():\n" zig-multiline-string-face)
      ("\\\\    print(\"Hello, world!\")\n" zig-multiline-string-face))))
 
+(ert-deftest test-font-lock-parameters-pointers-and-arrays ()
+  (zig-test-font-lock
+   "fn doSomething(thingPtr: *Thing, string: []const u8) void {}"
+   '(("fn" font-lock-keyword-face)
+     ("doSomething" font-lock-function-name-face)
+     ("thingPtr" font-lock-variable-name-face)
+     ("Thing" font-lock-type-face)
+     ("string" font-lock-variable-name-face)
+     ("const" font-lock-keyword-face)
+     ("u8" font-lock-type-face)
+     ("void" font-lock-type-face))))
+
 ;;===========================================================================;;
 ;; Indentation tests
 

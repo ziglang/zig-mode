@@ -159,7 +159,7 @@ If given a SOURCE, execute the CMD on it."
 (defconst zig-re-identifier "[[:word:]_][[:word:]_[:digit:]]*")
 (defconst zig-re-type-annotation
   (concat (zig-re-grab zig-re-identifier)
-          "[[:space:]]*:[[:space:]]*"
+          "[[:space:]]*:[[:space:]]*\\**[[:space:]]*\\(?:\\[[^]]*\\][[:space:]]*\\)?"
           (zig-re-grab zig-re-identifier)))
 
 (defun zig-re-definition (dtype)
