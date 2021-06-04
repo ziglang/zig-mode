@@ -282,6 +282,73 @@ If given a SOURCE, execute the CMD on it."
           ;; Skip backwards past whitespace and comment end delimiters.
           (/= 0 (skip-syntax-backward " >")))))
 
+(defun zig-in-str-or-cmnt () (nth 8 (syntax-ppss)))
+(defconst zig-top-item-beg-re
+  (concat "^ *"
+          (regexp-opt
+           '("pub" "extern" "export" ""))
+          "[[:space:]]*"
+          (regexp-opt
+           '("fn" "test"))
+          "[[:space:]]+")
+  "Start of a Zig item.")
+
+(defun zig-beginning-of-defun (&optional arg)
+  "Move backward to the beginning of the current defun.
+
+With ARG, move backward multiple defuns.  Negative ARG means
+move forward.
+
+This is written mainly to be used as `beginning-of-defun-function' for Zig."
+  (interactive "p")
+  (let* ((arg (or arg 1))
+         (magnitude (abs arg))
+         (sign (if (< arg 0) -1 1)))
+    ;; If moving forward, don't find the defun we might currently be
+    ;; on.
+    (when (< sign 0)
+      (end-of-line))
+    (catch 'done
+      (dotimes (_ magnitude)
+        ;; Search until we find a match that is not in a string or comment.
+        (while (if (re-search-backward (concat "^[[:space:]]*\\(" zig-top-item-beg-re "\\)")
+                                       nil 'move sign)
+                   (zig-in-str-or-cmnt)
+                 ;; Did not find it.
+                 (throw 'done nil)))))
+    t))
+
+(defun zig-end-of-defun ()
+  "Move forward to the next end of defun.
+
+With argument, do it that many times.
+Negative argument -N means move back to Nth preceding end of defun.
+
+Assume that this is called after `beginning-of-defun'.  So point is
+at the beginning of the defun body.
+
+This is written mainly to be used as `end-of-defun-function' for Zig."
+  (interactive)
+
+  ;; Jump over the function parameters and paren-wrapped return, if they exist.
+  (while (re-search-forward "(" (point-at-eol) t)
+    (progn
+      (backward-char)
+      (forward-sexp)))
+
+  ;; Find the opening brace
+  (if (re-search-forward "[{]" nil t)
+      (progn
+        (goto-char (match-beginning 0))
+        ;; Go to the closing brace
+        (condition-case nil
+            (forward-sexp)
+          (scan-error
+           (goto-char (point-max))))
+        (end-of-line))
+    ;; There is no opening brace, so consider the whole buffer to be one "defun"
+    (goto-char (point-max))))
+
 (defun zig-mode-indent-line ()
   (interactive)
   ;; First, calculate the column that this line should be indented to.
@@ -446,6 +513,8 @@ If given a SOURCE, execute the CMD on it."
               (append zig-electric-indent-chars
                       (and (boundp 'electric-indent-chars)
                            electric-indent-chars)))
+  (setq-local beginning-of-defun-function 'zig-beginning-of-defun)
+  (setq-local end-of-defun-function 'zig-end-of-defun)
   (setq-local indent-line-function 'zig-mode-indent-line)
   (setq-local indent-tabs-mode nil)  ; Zig forbids tab characters.
   (setq-local syntax-propertize-function 'zig-syntax-propertize)
