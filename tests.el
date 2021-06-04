@@ -101,6 +101,47 @@ const python =
      ("\\\\def main():\n" zig-multiline-string-face)
      ("\\\\    print(\"Hello, world!\")\n" zig-multiline-string-face))))
 
+(ert-deftest test-font-lock-parameters-pointers-and-arrays ()
+  (zig-test-font-lock
+   "fn doSomething(thingPtr: *Thing, string: []const u8, maybeFoo: ?Foo) void {}"
+   '(("fn" font-lock-keyword-face)
+     ("doSomething" font-lock-function-name-face)
+     ("thingPtr" font-lock-variable-name-face)
+     ("Thing" font-lock-type-face)
+     ("string" font-lock-variable-name-face)
+     ("const" font-lock-keyword-face)
+     ("u8" font-lock-type-face)
+     ("maybeFoo" font-lock-variable-name-face)
+     ("Foo" font-lock-type-face)
+     ("void" font-lock-type-face)
+     )))
+
+;; Test all permutations of '?', '*', '[]', '* const', and '[] const' for 3 of those in a row
+;; For example, ??[]Bar or [][]const *Bar
+(ert-deftest test-font-lock-parameters-optionals-pointers-and-arrays ()
+  (dotimes (i (* 5 5 5))
+    (let* ((int-to-opt-ptr-array (lambda (x)
+                                   (pcase x (0 "?") (1 "*") (2 "[]") (3 "*const ") (4 "[]const "))))
+           (first-symbol-int (/ i (* 5 5)))
+           (second-symbol-int (/ (% i (* 5 5)) 5))
+           (third-symbol-int (% i 5))
+           (first-symbol-const (>= first-symbol-int 3))
+           (second-symbol-const (>= second-symbol-int 3))
+           (third-symbol-const (>= third-symbol-int 3))
+           (first-symbol (funcall int-to-opt-ptr-array first-symbol-int))
+           (second-symbol (funcall int-to-opt-ptr-array second-symbol-int))
+           (third-symbol (funcall int-to-opt-ptr-array third-symbol-int))
+           (test-string (concat "fn foo(bar: " first-symbol second-symbol third-symbol "Bar) void {}"))
+           (expected (append '(("fn" font-lock-keyword-face)
+                               ("foo" font-lock-function-name-face)
+                               ("bar" font-lock-variable-name-face))
+                             (if first-symbol-const '(("const" font-lock-keyword-face)) nil)
+                             (if second-symbol-const '(("const" font-lock-keyword-face)) nil)
+                             (if third-symbol-const '(("const" font-lock-keyword-face)) nil)
+                             '(("Bar" font-lock-type-face)
+                               ("void" font-lock-type-face)))))
+      (zig-test-font-lock test-string expected))))
+
 ;;===========================================================================;;
 ;; Indentation tests
 
