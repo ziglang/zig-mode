@@ -326,8 +326,6 @@ This is written mainly to be used as `end-of-defun-function' for Zig."
         (condition-case nil
             (forward-sexp)
           (scan-error
-           ;; The parentheses are unbalanced; instead of being unable
-           ;; to fontify, just jump to the end of the buffer
            (goto-char (point-max))))
         (end-of-line))
     ;; There is no opening brace, so consider the whole buffer to be one "defun"
