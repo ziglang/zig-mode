@@ -3,7 +3,7 @@
 ;; Version: 0.0.8
 ;; Author: Andrea Orru <andreaorru1991@gmail.com>, Andrew Kelley <superjoe30@gmail.com>
 ;; Keywords: zig, languages
-;; Package-Requires: ((emacs "24.3"))
+;; Package-Requires: ((emacs "24.3") (reformatter "0.6"))
 ;; Homepage: https://github.com/zig-lang/zig-mode
 
 ;; This file is free software; you can redistribute it and/or modify
@@ -27,6 +27,8 @@
 
 ;;; Code:
 
+(require 'reformatter)
+
 (defgroup zig-mode nil
   "Support for Zig code."
   :link '(url-link "https://ziglang.org/")
@@ -46,7 +48,7 @@
 
 (defcustom zig-zig-bin "zig"
   "Path to zig executable."
-  :type 'string
+  :type 'file
   :safe #'stringp
   :group 'zig-mode)
 
@@ -72,14 +74,6 @@ If given a SOURCE, execute the CMD on it."
              (mapconcat 'shell-quote-argument (cons source args) " ")
            args)))
     (compile (concat zig-zig-bin " " cmd " " cmd-args))))
-
-;;;###autoload
-(defun zig-toggle-format-on-save ()
-  "Switch format before save on current buffer."
-  (interactive)
-  (if zig-format-on-save
-      (setq-local zig-format-on-save nil)
-    (setq-local zig-format-on-save t)))
 
 ;;;###autoload
 (defun zig-compile ()
@@ -120,33 +114,17 @@ If given a SOURCE, execute the CMD on it."
 (defvar zig-return-to-buffer-after-format nil
   "Enable zig-format-buffer to return to file buffer after fmt is done.")
 
-;;;###autoload
-(defun zig-format-buffer ()
-  "Format the current buffer using the zig fmt."
-  (interactive)
-  (let ((fmt-buffer-name "*zig-fmt*")
-        (file-buffer (current-buffer)))
-    ;; If we have an old *zig-fmt* buffer, we want to kill
-    ;; it and start a new one to show the new errors
-    (when (get-buffer fmt-buffer-name)
-      (switch-to-buffer-other-window fmt-buffer-name)
-      (quit-window)
-      (kill-buffer fmt-buffer-name))
-    (let ((fmt-buffer (get-buffer-create fmt-buffer-name)))
-      (set-process-sentinel
-       (start-process "zig-fmt"
-                      fmt-buffer
-                      zig-zig-bin
-                      "fmt"
-                      (buffer-file-name))
-       (lambda (process _e)
-         (if (> (process-exit-status process) 0)
-             (progn
-               (pop-to-buffer fmt-buffer)
-               (compilation-mode)
-               (when zig-return-to-buffer-after-format
-                 (pop-to-buffer file-buffer)))
-           (revert-buffer :ignore-auto :noconfirm)))))))
+;; zig fmt
+
+(reformatter-define zig-format
+  :program zig-zig-bin
+  :args '("fmt" "--stdin")
+  :group 'zig-mode
+  :lighter " ZigFmt")
+
+;;;###autoload (autoload 'zig-format-buffer "current-file" nil t)
+;;;###autoload (autoload 'zig-format-region "current-file" nil t)
+;;;###autoload (autoload 'zig-format-on-save-mode "current-file" nil t)
 
 (defun zig-re-word (inner)
   "Construct a regular expression for the word INNER."
@@ -531,11 +509,8 @@ This is written mainly to be used as `end-of-defun-function' for Zig."
                              nil nil nil nil
                              (font-lock-syntactic-face-function . zig-mode-syntactic-face-function)))
 
-  (add-hook 'before-save-hook 'zig-before-save-hook nil t))
-
-(defun zig-before-save-hook ()
   (when zig-format-on-save
-	(zig-format-buffer)))
+    (zig-format-on-save-mode 1)))
 
 (defun colorize-compilation-buffer ()
   (read-only-mode 0)
