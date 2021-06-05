@@ -156,10 +156,18 @@ If given a SOURCE, execute the CMD on it."
   "Construct a group regular expression for INNER."
   (concat "\\(" inner "\\)"))
 
+(defconst zig-re-optional "\\(?:[[:space:]]*\\?[[:space:]]*\\)")
+(defconst zig-re-pointer "\\(?:[[:space:]]*\\*\\(?:const[[:space:]]*\\)?[[:space:]]*\\)")
+(defconst zig-re-array "\\(?:[[:space:]]*\\[[^]]*\\]\\(?:const[[:space:]]*\\)?[[:space:]]*\\)")
+
+(defconst zig-re-optionals-pointers-arrays
+  (concat "\\(?:" zig-re-optional "\\|" zig-re-pointer "\\|" zig-re-array "\\)*"))
+
 (defconst zig-re-identifier "[[:word:]_][[:word:]_[:digit:]]*")
 (defconst zig-re-type-annotation
   (concat (zig-re-grab zig-re-identifier)
           "[[:space:]]*:[[:space:]]*"
+          zig-re-optionals-pointers-arrays
           (zig-re-grab zig-re-identifier)))
 
 (defun zig-re-definition (dtype)
