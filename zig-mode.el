@@ -44,6 +44,12 @@
   :safe #'booleanp
   :group 'zig-mode)
 
+(defcustom zig-format-show-buffer t
+  "Show a *zig-fmt* buffer after zig fmt completes with errors"
+  :type 'boolean
+  :safe #'booleanp
+  :group 'zig-mode)
+
 (defcustom zig-zig-bin "zig"
   "Path to zig executable."
   :type 'string
@@ -141,11 +147,12 @@ If given a SOURCE, execute the CMD on it."
                       (buffer-file-name))
        (lambda (process _e)
          (if (> (process-exit-status process) 0)
-             (progn
-               (pop-to-buffer fmt-buffer)
-               (compilation-mode)
-               (when zig-return-to-buffer-after-format
-                 (pop-to-buffer file-buffer)))
+             (when zig-format-show-buffer
+               (progn
+                 (pop-to-buffer fmt-buffer)
+                 (compilation-mode)
+                 (when zig-return-to-buffer-after-format
+                   (pop-to-buffer file-buffer))))
            (revert-buffer :ignore-auto :noconfirm)))))))
 
 (defun zig-re-word (inner)
