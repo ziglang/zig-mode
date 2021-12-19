@@ -234,13 +234,14 @@ If given a SOURCE, execute the CMD on it."
 
     ;; C types
     "c_short" "c_ushort" "c_int" "c_uint" "c_long" "c_ulong"
-    "c_longlong" "c_ulonglong" "c_longdouble" "c_void"
+    "c_longlong" "c_ulonglong" "c_longdouble"
 
     ;; Comptime types
     "comptime_int" "comptime_float"
 
     ;; Other types
-    "bool" "void" "noreturn" "type" "error" "anyerror" "anyframe" "anytype"))
+    "bool" "void" "noreturn" "type" "error" "anyerror" "anyframe" "anytype"
+    "anyopaque"))
 
 (defconst zig-constants
   '(
