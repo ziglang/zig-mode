@@ -153,8 +153,8 @@ If given a SOURCE, execute the CMD on it."
              (when zig-format-show-buffer
                (progn
                  (pop-to-buffer fmt-buffer)
-		 (when zig-ansi-color-for-format-errors
-		   (ansi-color-apply-on-region (point-min) (point-max)))
+                 (when zig-ansi-color-for-format-errors
+                   (ansi-color-apply-on-region (point-min) (point-max)))
                  (compilation-mode)
                  (when zig-return-to-buffer-after-format
                    (pop-to-buffer file-buffer))))
