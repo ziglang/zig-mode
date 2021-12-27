@@ -126,6 +126,9 @@ If given a SOURCE, execute the CMD on it."
 (defvar zig-return-to-buffer-after-format nil
   "Enable zig-format-buffer to return to file buffer after fmt is done.")
 
+(defvar zig-ansi-color-for-format-errors nil
+  "Enable ansi-coloration of error output from zig fmt.")
+
 ;;;###autoload
 (defun zig-format-buffer ()
   "Format the current buffer using the zig fmt."
@@ -150,6 +153,8 @@ If given a SOURCE, execute the CMD on it."
              (when zig-format-show-buffer
                (progn
                  (pop-to-buffer fmt-buffer)
+                 (when zig-ansi-color-for-format-errors
+                   (ansi-color-apply-on-region (point-min) (point-max)))
                  (compilation-mode)
                  (when zig-return-to-buffer-after-format
                    (pop-to-buffer file-buffer))))
