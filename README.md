@@ -1,7 +1,7 @@
 # zig-mode
 
 Syntax highlighting and automatic indentation for the
-[Zig programming language](http://ziglang.org) in Emacs.  Requires Emacs 24 or
+[Zig programming language](http://ziglang.org) in Emacs.  Requires Emacs 24.3 or
 later.
 
 ## Installation
