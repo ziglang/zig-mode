@@ -6,9 +6,10 @@ later.
 
 ## Installation
 
+[![NonGNU ELPA](https://elpa.nongnu.org/nongnu/zig-mode.svg)](https://elpa.nongnu.org/nongnu/zig-mode.html)
 [![MELPA](https://melpa.org/packages/zig-mode-badge.svg)](https://melpa.org/#/zig-mode)
 
-Simply install the `zig-mode` package via
+Simply install the `zig-mode` package via [NonGNU ELPA](https://elpa.nongnu.org/) or
 [MELPA](https://melpa.org/#/getting-started).
 
 Alternatively, you can `git clone` the `zig-mode` repository somewhere
