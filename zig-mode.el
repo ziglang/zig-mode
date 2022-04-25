@@ -551,9 +551,8 @@ This is written mainly to be used as `end-of-defun-function' for Zig."
 	(zig-format-buffer)))
 
 (defun colorize-compilation-buffer ()
-  (read-only-mode 0)
-  (ansi-color-apply-on-region compilation-filter-start (point))
-  (read-only-mode 1))
+  (let ((inhibit-read-only t))
+    (ansi-color-apply-on-region compilation-filter-start (point))))
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.zig\\'" . zig-mode))
