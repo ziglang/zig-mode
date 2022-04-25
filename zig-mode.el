@@ -76,7 +76,12 @@ If given a SOURCE, execute the CMD on it."
   (let ((cmd-args
          (if source
              (mapconcat 'shell-quote-argument (cons source args) " ")
-           args)))
+           args))
+        (compilation-environment
+         (append (when (advice-member-p 'zig--ansi-color-apply-on-region 'ansi-color-apply-on-region)
+                   ;; Enable std.Progress output for zig commands
+                   '("TERM=ansi"))
+                 compilation-environment)))
     (compile (concat zig-zig-bin " " cmd " " cmd-args))))
 
 ;;;###autoload
@@ -549,6 +554,80 @@ This is written mainly to be used as `end-of-defun-function' for Zig."
 (defun zig-before-save-hook ()
   (when zig-format-on-save
 	(zig-format-buffer)))
+
+(when (= emacs-major-version 28)
+  (defun zig-enable-progress-parsing ()
+    "Enable std.Progress output parsing for compilation and shell buffers."
+    (advice-add 'ansi-color-apply-on-region :override 'zig--ansi-color-apply-on-region))
+
+  ;; A patched version of `ansi-color-apply-on-region` that supports
+  ;; cursor back (CUB) ANSI sequences that are required to parse Zig's std.Progress output.
+  ;; Based on the Emacs 28.1 version of this function.
+  (defun zig--ansi-color-apply-on-region (begin end &optional preserve-sequences)
+    (let ((codes (car ansi-color-context-region))
+          (start-marker (or (cadr ansi-color-context-region)
+                            (copy-marker begin)))
+          (end-marker (copy-marker end)))
+      (save-excursion
+        (goto-char start-marker)
+        ;; Find the next escape sequence.
+        (while (re-search-forward ansi-color-control-seq-regexp end-marker t)
+          ;; Extract escape sequence.
+          (let ((esc-seq (buffer-substring
+                          (match-beginning 0) (point))))
+            (if preserve-sequences
+                ;; Make the escape sequence transparent.
+                (overlay-put (make-overlay (match-beginning 0) (point))
+                             'invisible t)
+              ;; Otherwise, strip.
+              (delete-region (match-beginning 0) (point)))
+
+            ;; Colorize the old block from start to end using old face.
+            (funcall ansi-color-apply-face-function
+                     (prog1 (marker-position start-marker)
+                       ;; Store new start position.
+                       (set-marker start-marker (point)))
+                     (match-beginning 0) (ansi-color--find-face codes))
+            (let ((last-char (aref esc-seq (1- (length esc-seq)))))
+              (pcase last-char
+                ;; A color sequence
+                (`?m
+                 ;; update the list of ansi codes.
+                 (setq codes (ansi-color-apply-sequence esc-seq codes)))
+                ;; A cursor back (CUB) sequence
+                (`?D
+                 (let ((n (string-to-number (substring esc-seq 2 -1)))
+                       (line-start (let ((inhibit-field-text-motion t))
+                                     (line-beginning-position))))
+                   (delete-region (max line-start (- (point) n)) (point))))))))
+        ;; search for the possible start of a new escape sequence
+        (if (re-search-forward "\033" end-marker t)
+	        (progn
+	          ;; if the rest of the region should have a face, put it there
+	          (funcall ansi-color-apply-face-function
+		               start-marker (point) (ansi-color--find-face codes))
+	          ;; save codes and point
+	          (setq ansi-color-context-region
+		            (list codes (copy-marker (match-beginning 0)))))
+	      ;; if the rest of the region should have a face, put it there
+	      (funcall ansi-color-apply-face-function
+		           start-marker end-marker (ansi-color--find-face codes))
+          ;; Save a restart position when there are codes active. It's
+          ;; convenient for man.el's process filter to pass `begin'
+          ;; positions that overlap regions previously colored; these
+          ;; `codes' should not be applied to that overlap, so we need
+          ;; to know where they should really start.
+	      (setq ansi-color-context-region
+                (if codes (list codes (copy-marker (point)))))))
+      ;; Clean up our temporary markers.
+      (unless (eq start-marker (cadr ansi-color-context-region))
+        (set-marker start-marker nil))
+      (unless (eq end-marker (cadr ansi-color-context-region))
+        (set-marker end-marker nil)))))
+
+;;;###autoload
+(when (= emacs-major-version 28)
+  (autoload 'zig-mode "zig-enable-progress-parsing"))
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.zig\\'" . zig-mode))

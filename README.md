@@ -22,6 +22,13 @@ Alternatively, you can `git clone` the `zig-mode` repository somewhere
   (add-to-list 'auto-mode-alist '("\\.zig\\'" . zig-mode)))
 ```
 
+To enable parsing of Zig `std.Progress` output (which is shown during `zig build`) in compilation or shell
+buffers, add the following to your emacs config:
+```
+(zig-enable-progress-parsing)
+```
+This overrides function `ansi-color-apply-on-region` with a patched version.
+
 ## Testing
 
 [![Build status](https://ci.appveyor.com/api/projects/status/u78j130vv4l6v21t?svg=true)](https://ci.appveyor.com/project/mdsteele/zig-mode)
