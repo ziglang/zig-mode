@@ -61,9 +61,11 @@ const string =
 // This is a normal comment\n
 /// This is a doc comment\n
 //// This is a normal comment again\n"
-   '(("// This is a normal comment\n" font-lock-comment-face)
+   '(("// " font-lock-comment-delimiter-face)
+     ("This is a normal comment\n" font-lock-comment-face)
      ("/// This is a doc comment\n" font-lock-doc-face)
-     ("//// This is a normal comment again\n" font-lock-comment-face))))
+     ("//// " font-lock-comment-delimiter-face)
+     ("This is a normal comment again\n" font-lock-comment-face))))
 
 (ert-deftest test-font-lock-decl-const ()
   (zig-test-font-lock
