@@ -529,6 +529,7 @@ This is written mainly to be used as `end-of-defun-function' for Zig."
 \\{zig-mode-map}"
   :group 'zig-mode
   (setq-local comment-start "// ")
+  (setq-local comment-start-skip "//+ *")
   (setq-local comment-end "")
   (setq-local electric-indent-chars
               (append zig-electric-indent-chars
