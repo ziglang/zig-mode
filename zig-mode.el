@@ -158,7 +158,9 @@ If given a SOURCE, execute the CMD on it."
                  (compilation-mode)
                  (when zig-return-to-buffer-after-format
                    (pop-to-buffer file-buffer))))
-           (revert-buffer :ignore-auto :noconfirm)))))))
+           (let ((active-minor-modes-list minor-mode-list))
+	     (revert-buffer :ignore-auto :noconfirm :preserve-modes)
+	     (setq minor-mode-list active-minor-modes-list))))))))
 
 (defun zig-re-word (inner)
   "Construct a regular expression for the word INNER."
