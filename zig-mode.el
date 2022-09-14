@@ -142,7 +142,7 @@ If given a SOURCE, execute the CMD on it."
         (dir (directory-file-name
               (replace-regexp-in-string "^Directory " "" default-directory))))
     (while (and (< count zig-project-root-search-up)
-                (let ((is-dir? (member zig-build-file (directory-files dir))))
+                (let ((is-dir? (member zig-project-build-file (directory-files dir))))
                   (when is-dir?
                     (setq root-dir dir))
                   (not is-dir?)))
@@ -552,10 +552,11 @@ This is written mainly to be used as `end-of-defun-function' for Zig."
 
 (defvar zig-mode-map
   (let ((map (make-sparse-keymap)))
-	(define-key map (kbd "C-c C-b") 'zig-build-run)
+	(define-key map (kbd "C-c C-b") 'zig-build)
 	(define-key map (kbd "C-c C-f") 'zig-format-buffer)
 	(define-key map (kbd "C-c C-r") 'zig-run)
 	(define-key map (kbd "C-c C-t") 'zig-test-buffer)
+        (define-key map (kbd "C-c C-p") 'zig-project-build-run)
 	map)
   "Keymap for Zig major mode.")
 
