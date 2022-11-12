@@ -40,6 +40,24 @@ e.g.:
 EMACS=/usr/bin/emacs24 ./run_tests.sh
 ```
 
+## Optional Configuration
+
+`zig-mode` used to enable coloration of the compilation buffer using
+ANSI color codes, but this affected *all* compilation buffers, not just
+zig compilation output.
+If you want to restore this behavior, you can add the following snippet
+to your `init.el` or `.emacs` file:
+
+```elisp
+(if (>= emacs-major-version 28)
+    (add-hook 'compilation-filter-hook 'ansi-color-compilation-filter)
+  (progn
+    (defun colorize-compilation-buffer ()
+      (let ((inhibit-read-only t))
+        (ansi-color-apply-on-region compilation-filter-start (point))))
+    (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)))
+```
+
 ## License
 
 `zig-mode` is distributed under the terms of the GNU General Public License as
