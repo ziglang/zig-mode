@@ -77,7 +77,7 @@ If given a SOURCE, execute the CMD on it."
          (if source
              (mapconcat 'shell-quote-argument (cons source args) " ")
            args)))
-    (compile (concat zig-zig-bin " " cmd " " cmd-args))))
+    (compilation-start (concat zig-zig-bin " " cmd " " cmd-args))))
 
 ;;;###autoload
 (defun zig-toggle-format-on-save ()
