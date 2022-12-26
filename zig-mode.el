@@ -68,6 +68,18 @@
   :safe #'stringp
   :group 'zig-mode)
 
+(defcustom zig-project-build-file "build.zig"
+  "Name of project build file used to find the project root."
+  :type 'string
+  :safe #'stringp
+  :group 'zig-mode)
+
+(defcustom zig-project-root-search-up 3
+  "The number of directories to search upwards to find project root."
+  :type 'integer
+  :group 'zig-mode
+  :safe #'integerp)
+
 ;; zig CLI commands
 
 (defun zig--run-cmd (cmd &optional source &rest args)
@@ -122,6 +134,31 @@ If given a SOURCE, execute the CMD on it."
   "Create an executable from the current buffer and run it immediately."
   (interactive)
   (zig--run-cmd "run" (buffer-file-name) "-O" zig-run-optimization-mode))
+
+(defun zig--find-project-root ()
+  "Find the directory with the `zig-project-build-file'."
+  (let ((count 0)
+        root-dir
+        (dir (directory-file-name
+              (replace-regexp-in-string "^Directory " "" default-directory))))
+    (while (and (< count zig-project-root-search-up)
+                (let ((is-dir? (member zig-project-build-file (directory-files dir))))
+                  (when is-dir?
+                    (setq root-dir dir))
+                  (not is-dir?)))
+      (setq dir (file-name-directory dir))
+      (setq count (+ count 1)))
+    root-dir))
+
+;;;###autoload
+(defun zig-project-build-run ()
+  "Create an executable from the current project and run it immediately."
+  (interactive)
+  (let ((root-dir (zig--find-project-root)))
+    (if root-dir
+        (let ((default-directory root-dir))
+          (compile (concat "zig build run")))
+      (message (.. "Could not find " zig-build-file)))))
 
 (defvar zig-return-to-buffer-after-format nil
   "Enable zig-format-buffer to return to file buffer after fmt is done.")
@@ -519,6 +556,7 @@ This is written mainly to be used as `end-of-defun-function' for Zig."
 	(define-key map (kbd "C-c C-f") 'zig-format-buffer)
 	(define-key map (kbd "C-c C-r") 'zig-run)
 	(define-key map (kbd "C-c C-t") 'zig-test-buffer)
+        (define-key map (kbd "C-c C-p") 'zig-project-build-run)
 	map)
   "Keymap for Zig major mode.")
 
