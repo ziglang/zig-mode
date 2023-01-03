@@ -19,4 +19,4 @@ INIT_PACKAGES="(progn \
       (package-install pkg))) \
   )"
 
-${EMACS} --eval "${INIT_PACKAGES}" --batch -l zig-mode.el -l tests.el -f ert-run-tests-batch-and-exit
+"${EMACS}" --eval "${INIT_PACKAGES}" --batch -l zig-mode.el -l tests.el -f ert-run-tests-batch-and-exit

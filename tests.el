@@ -219,7 +219,7 @@ blarg(foo,
           quux,
       quux);"))
 
-(ert-deftest test-indent-if-else ()
+(ert-deftest test-indent-if-else-statement ()
   (zig-test-indent-region
    "
 fn sign(value: i32) i32 {
@@ -238,6 +238,27 @@ fn sign(value: i32) i32 {
     } else {
         return 0;
     }
+}"))
+
+(ert-deftest test-indent-if-else-expression ()
+  (zig-test-indent-region
+   "
+fn sign(i: i32) i32 {
+return if (i == 0)
+0
+else if (i > 0)
+-1
+else
+-1;
+}"
+   "
+fn sign(i: i32) i32 {
+    return if (i == 0)
+        0
+    else if (i > 0)
+        -1
+    else
+        -1;
 }"))
 
 (ert-deftest test-indent-struct ()
