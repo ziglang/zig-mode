@@ -378,7 +378,7 @@ This is written mainly to be used as `end-of-defun-function' for Zig."
                   ;; expression from the previous line, false otherwise.
                   (is-expr-continutation
                    (and
-                    (not (looking-at "[]});]"))
+                    (not (looking-at "[]});]\\|else"))
                     (save-excursion
                       (zig-skip-backwards-past-whitespace-and-comments)
                       (when (> (point) 1)
