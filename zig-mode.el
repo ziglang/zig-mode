@@ -321,7 +321,7 @@ This is written mainly to be used as `end-of-defun-function' for Zig."
   (interactive)
 
   ;; Jump over the function parameters and paren-wrapped return, if they exist.
-  (while (re-search-forward "(" (point-at-eol) t)
+  (while (re-search-forward "(" (line-end-position) t)
     (progn
       (backward-char)
       (forward-sexp)))
