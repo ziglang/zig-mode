@@ -391,16 +391,6 @@ const FooBarError = enum {};
 	  "Foo"
 	  "FooBarError"))))
 
-(ert-deftest test-imenu-enum ()
-  (test-imenu
-   "
-pub const Foo = enum {};
-const FooBarError = enum {};
-"
-   '(("Enum"
-	  "Foo"
-	  "FooBarError"))))
-
 (ert-deftest test-imenu-all ()
   (test-imenu
    "
