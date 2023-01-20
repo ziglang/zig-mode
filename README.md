@@ -1,8 +1,7 @@
 # zig-mode
 
-Syntax highlighting and automatic indentation for the
-[Zig programming language](http://ziglang.org) in Emacs.  Requires Emacs 24.3 or
-later.
+Syntax highlighting and automatic indentation for the [Zig programming
+language](http://ziglang.org) in Emacs.  Requires Emacs 24.3 or later.
 
 ## Installation
 
@@ -12,8 +11,19 @@ later.
 Simply install the `zig-mode` package via [NonGNU ELPA](https://elpa.nongnu.org/) or
 [MELPA](https://melpa.org/#/getting-started).
 
+### Manual install
+
 Alternatively, you can `git clone` the `zig-mode` repository somewhere
-(e.g. under your `~/.emacs.d/`), then add the following to your `.emacs` file:
+(e.g. under your `~/.emacs.d/`). `zig-mode` depends on
+[reformatter](https://github.com/purcell/emacs-reformatter) for
+formatting buffers with `zig fmt`.
+
+`reformatter` can be installed from MELPA or installed manually in a
+similar fashion to `zig-mode`. For this method, clone the
+`reformatter` git repository and add the path to the repository to
+your `load-path`.
+
+Then add the following to your `.emacs` file:
 
 ```elisp
 (unless (version< emacs-version "24")
@@ -24,7 +34,7 @@ Alternatively, you can `git clone` the `zig-mode` repository somewhere
 
 ## Testing
 
-[![Build status](https://ci.appveyor.com/api/projects/status/u78j130vv4l6v21t?svg=true)](https://ci.appveyor.com/project/mdsteele/zig-mode)
+[![CI](https://github.com/ziglang/zig-mode/actions/workflows/main.yml/badge.svg)](https://github.com/ziglang/zig-mode/actions/workflows/main.yml)
 
 To run all unit tests with `emacs`, run:
 
