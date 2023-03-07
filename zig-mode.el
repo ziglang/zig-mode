@@ -518,7 +518,7 @@ This is written mainly to be used as `end-of-defun-function' for Zig."
     (zig-format-on-save-mode 1)))
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.zig\\|zon\\'" . zig-mode))
+(add-to-list 'auto-mode-alist '("\\.\\(zig\\|zon\\)\\'" . zig-mode))
 
 (provide 'zig-mode)
 ;;; zig-mode.el ends here
