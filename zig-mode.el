@@ -204,10 +204,10 @@ If given a SOURCE, execute the CMD on it."
     "isize" "usize"
 
     ;; Floating types
-    "f16" "f32" "f64" "f128"
+    "f16" "f32" "f64" "f80" "f128"
 
     ;; C types
-    "c_short" "c_ushort" "c_int" "c_uint" "c_long" "c_ulong"
+    "c_char" "c_short" "c_ushort" "c_int" "c_uint" "c_long" "c_ulong"
     "c_longlong" "c_ulonglong" "c_longdouble"
 
     ;; Comptime types
