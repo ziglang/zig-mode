@@ -91,31 +91,31 @@ If given a SOURCE, execute the CMD on it."
 (defun zig-build-exe ()
   "Create executable from source or object file."
   (interactive)
-  (zig--run-cmd "build-exe" (buffer-file-name)))
+  (zig--run-cmd "build-exe" (file-local-name (buffer-file-name))))
 
 ;;;###autoload
 (defun zig-build-lib ()
   "Create library from source or assembly."
   (interactive)
-  (zig--run-cmd "build-lib" (buffer-file-name)))
+  (zig--run-cmd "build-lib" (file-local-name (buffer-file-name))))
 
 ;;;###autoload
 (defun zig-build-obj ()
   "Create object from source or assembly."
   (interactive)
-  (zig--run-cmd "build-obj" (buffer-file-name)))
+  (zig--run-cmd "build-obj" (file-local-name (buffer-file-name))))
 
 ;;;###autoload
 (defun zig-test-buffer ()
   "Test buffer using `zig test`."
   (interactive)
-  (zig--run-cmd "test" (buffer-file-name) "-O" zig-test-optimization-mode))
+  (zig--run-cmd "test" (file-local-name (buffer-file-name)) "-O" zig-test-optimization-mode))
 
 ;;;###autoload
 (defun zig-run ()
   "Create an executable from the current buffer and run it immediately."
   (interactive)
-  (zig--run-cmd "run" (buffer-file-name) "-O" zig-run-optimization-mode))
+  (zig--run-cmd "run" (file-local-name (buffer-file-name)) "-O" zig-run-optimization-mode))
 
 ;; zig fmt
 
