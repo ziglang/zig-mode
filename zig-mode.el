@@ -178,7 +178,7 @@ If given a SOURCE, execute the CMD on it."
     ;; Storage
     "const" "var" "extern" "packed" "export" "pub" "noalias" "inline"
     "noinline" "comptime" "callconv" "volatile" "allowzero"
-    "align" "linksection" "threadlocal"
+    "align" "linksection" "threadlocal" "addrspace"
 
     ;; Structure
     "struct" "enum" "union" "error" "opaque"
