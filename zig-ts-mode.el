@@ -192,21 +192,45 @@
      [".."
       "..."] @font-lock-punctuation-face)))
 
+(defvar zig-ts-indent-rules
+  `((zig
+     ((node-is ")") parent-bol 0)
+     ((node-is "]") parent-bol 0)
+     ((node-is "}") parent-bol 0)
+     ((parent-is "block") parent-bol zig-indent-offset)
+     ((parent-is "AsmExpr") parent-bol zig-indent-offset)
+     ((parent-is "AssignExpr") parent-bol zig-indent-offset)
+     ((parent-is "Block") parent-bol zig-indent-offset)
+     ((parent-is "BlockExpr") parent-bol zig-indent-offset)
+     ((parent-is "ContainerDecl") parent-bol zig-indent-offset)
+     ((parent-is "ErrorUnionExpr") parent-bol zig-indent-offset)
+     ((parent-is "InitList") parent-bol zig-indent-offset)
+     ((parent-is "SwitchExpr") parent-bol zig-indent-offset)
+     ((parent-is "TestDecl") parent-bol zig-indent-offset))))
+
 (defun zig-ts-setup ()
   "Setup treesit for zig-ts-mode."
   (interactive)
+
+  ;; Font-lock
   (setq-local treesit-font-lock-settings
                (apply #'treesit-font-lock-rules
                     zig-ts-font-lock-rules))
-
-  (setq-local font-lock-defaults nil)
   (setq-local treesit-font-lock-feature-list
               '((comment)
                 (builtin keyword type)
                 (constant string numeric)
                 (variable function label operator punctuation)))
 
-  ;; (setq-local treesit-simple-indent-rules zig-ts-indent-rules)
+  ;; Indentation
+  (setq-local treesit-simple-indent-rules zig-ts-indent-rules)
+
+  ;; TODO Navigation
+  ;; (setq-local treesit-defun-type-regexp ...)
+  ;; (setq-local treesit-defun-name-function ...)
+
+  ;; TODO Imenu
+  ;; (setq-local treesit-simple-imenu-settings
 
   (treesit-major-mode-setup))
 

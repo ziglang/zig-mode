@@ -134,7 +134,13 @@
   :group 'zig-mode
   (setq font-lock-defaults '(zig-font-lock-keywords
                              nil nil nil nil
-                             (font-lock-syntactic-face-function . zig-mode-syntactic-face-function))))
+                             (font-lock-syntactic-face-function . zig-mode-syntactic-face-function)))
+  (setq-local beginning-of-defun-function 'zig-beginning-of-defun)
+  (setq-local end-of-defun-function 'zig-end-of-defun)
+  (setq-local indent-line-function 'zig-mode-indent-line)
+  (setq-local syntax-propertize-function 'zig-syntax-propertize)
+  (setq-local imenu-generic-expression zig-imenu-generic-expression))
+
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.\\(zig\\|zon\\)\\'" . zig-mode))

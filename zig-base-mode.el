@@ -407,12 +407,7 @@ This mode is intended to be derived by concrete major modes."
               (append zig-electric-indent-chars
                       (and (boundp 'electric-indent-chars)
                            electric-indent-chars)))
-  (setq-local beginning-of-defun-function 'zig-beginning-of-defun)
-  (setq-local end-of-defun-function 'zig-end-of-defun)
-  (setq-local indent-line-function 'zig-mode-indent-line)
   (setq-local indent-tabs-mode nil)  ; Zig forbids tab characters.
-  (setq-local syntax-propertize-function 'zig-syntax-propertize)
-  (setq-local imenu-generic-expression zig-imenu-generic-expression)
 
   (when zig-format-on-save
     (zig-format-on-save-mode 1)))
