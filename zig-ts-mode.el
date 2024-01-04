@@ -21,7 +21,9 @@
 
 ;;; Commentary:
 
-;; A tree-sitter enabled major mode for the Zig programming languages.
+;; A tree-sitter enabled major mode for the Zig programming languages making use
+;; of the tree-sitter grammar from https://github.com/maxxnino/tree-sitter-zig.
+;; Syntax highlighting and indentation queries are adapted from that source.
 
 ;; See documentation on https://github.com/zig-lang/zig-mode
 
