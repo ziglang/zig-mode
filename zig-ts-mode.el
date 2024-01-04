@@ -28,6 +28,7 @@
 ;;; Code:
 
 (require 'zig-base-mode)
+(require 'treesit)
 (eval-when-compile (require 'rx))
 
 (defvar zig-ts-font-lock-rules
