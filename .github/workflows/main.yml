@@ -50,3 +50,4 @@ jobs:
         eask package
         eask install
         eask compile
+        eask test ert ./test/*.el
