@@ -36,19 +36,45 @@ Then add the following to your `.emacs` file:
 
 [![CI](https://github.com/ziglang/zig-mode/actions/workflows/main.yml/badge.svg)](https://github.com/ziglang/zig-mode/actions/workflows/main.yml)
 
-To run all unit tests with `emacs`, run:
+To run the test locally, you will need the following tools:
 
-```bash
-./run_tests.sh
+- [Eask](https://emacs-eask.github.io/)
+- [Make](https://www.gnu.org/software/make/) (optional)
+
+Install all dependencies and development dependencies:
+
+```sh
+$ eask install-deps --dev
 ```
 
-Note that Emacs 24.3 or later is required.  If you need to specify which Emacs
-binary to use, you can do that by setting the `EMACS` environment variable,
-e.g.:
+To test the package's installation:
 
-```bash
-EMACS=/usr/bin/emacs24 ./run_tests.sh
+```sh
+$ eask package
+$ eask install
 ```
+
+To test compilation:
+
+```sh
+$ eask compile
+```
+
+**🪧 The following steps are optional, but we recommend you follow these lint results!**
+
+The built-in `checkdoc` linter:
+
+```sh
+$ eask lint checkdoc
+```
+
+The standard `package` linter:
+
+```sh
+$ eask lint package
+```
+
+*📝 P.S. For more information, find the Eask manual at https://emacs-eask.github.io/.*
 
 ## Optional Configuration
 

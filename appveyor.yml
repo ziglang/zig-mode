@@ -1,7 +1,0 @@
-image: ubuntu
-install:
-- sudo apt-get update
-- sudo apt-get install -y emacs25
-build: off
-test_script:
-- ./run_tests.sh

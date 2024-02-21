@@ -1,10 +1,12 @@
 ;;; zig-mode.el --- A major mode for the Zig programming language -*- lexical-binding: t -*-
 
+;; Author: Andrea Orru <andreaorru1991@gmail.com>
+;;         Andrew Kelley <superjoe30@gmail.com>
+;; Maintainer: Shen, Jen-Chieh <jcs090218@gmail.com>
+;; URL: https://github.com/zig-lang/zig-mode
 ;; Version: 0.0.8
-;; Author: Andrea Orru <andreaorru1991@gmail.com>, Andrew Kelley <superjoe30@gmail.com>
+;; Package-Requires: ((emacs "26.1") (reformatter "0.6"))
 ;; Keywords: zig, languages
-;; Package-Requires: ((emacs "24.3") (reformatter "0.6"))
-;; Homepage: https://github.com/zig-lang/zig-mode
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -91,31 +93,31 @@ If given a SOURCE, execute the CMD on it."
 (defun zig-build-exe ()
   "Create executable from source or object file."
   (interactive)
-  (zig--run-cmd "build-exe" (buffer-file-name)))
+  (zig--run-cmd "build-exe" (file-local-name (buffer-file-name))))
 
 ;;;###autoload
 (defun zig-build-lib ()
   "Create library from source or assembly."
   (interactive)
-  (zig--run-cmd "build-lib" (buffer-file-name)))
+  (zig--run-cmd "build-lib" (file-local-name (buffer-file-name))))
 
 ;;;###autoload
 (defun zig-build-obj ()
   "Create object from source or assembly."
   (interactive)
-  (zig--run-cmd "build-obj" (buffer-file-name)))
+  (zig--run-cmd "build-obj" (file-local-name (buffer-file-name))))
 
 ;;;###autoload
 (defun zig-test-buffer ()
   "Test buffer using `zig test`."
   (interactive)
-  (zig--run-cmd "test" (buffer-file-name) "-O" zig-test-optimization-mode))
+  (zig--run-cmd "test" (file-local-name (buffer-file-name)) "-O" zig-test-optimization-mode))
 
 ;;;###autoload
 (defun zig-run ()
   "Create an executable from the current buffer and run it immediately."
   (interactive)
-  (zig--run-cmd "run" (buffer-file-name) "-O" zig-run-optimization-mode))
+  (zig--run-cmd "run" (file-local-name (buffer-file-name)) "-O" zig-run-optimization-mode))
 
 ;; zig fmt
 
@@ -174,11 +176,10 @@ If given a SOURCE, execute the CMD on it."
     table))
 
 (defconst zig-keywords
-  '(
-    ;; Storage
+  '(;; Storage
     "const" "var" "extern" "packed" "export" "pub" "noalias" "inline"
     "noinline" "comptime" "callconv" "volatile" "allowzero"
-    "align" "linksection" "threadlocal"
+    "align" "linksection" "threadlocal" "addrspace"
 
     ;; Structure
     "struct" "enum" "union" "error" "opaque"
@@ -197,17 +198,16 @@ If given a SOURCE, execute the CMD on it."
     "fn" "usingnamespace" "test"))
 
 (defconst zig-types
-  '(
-    ;; Integer types
+  '(;; Integer types
     "i2" "u2" "i3" "u3" "i4" "u4" "i5" "u5" "i6" "u6" "i7" "u7" "i8" "u8"
     "i16" "u16" "i29" "u29" "i32" "u32" "i64" "u64" "i128" "u128"
     "isize" "usize"
 
     ;; Floating types
-    "f16" "f32" "f64" "f128"
+    "f16" "f32" "f64" "f80" "f128"
 
     ;; C types
-    "c_short" "c_ushort" "c_int" "c_uint" "c_long" "c_ulong"
+    "c_char" "c_short" "c_ushort" "c_int" "c_uint" "c_long" "c_ulong"
     "c_longlong" "c_ulonglong" "c_longdouble"
 
     ;; Comptime types
@@ -218,15 +218,14 @@ If given a SOURCE, execute the CMD on it."
     "anyopaque"))
 
 (defconst zig-constants
-  '(
-    ;; Boolean
+  '(;; Boolean
     "true" "false"
 
     ;; Other constants
     "null" "undefined"))
 
 (defconst zig-electric-indent-chars
-  '( ?\; ?\, ?\) ?\] ?\} ))
+  '(?\; ?\, ?\) ?\] ?\}))
 
 (defface zig-multiline-string-face
   '((t :inherit font-lock-string-face))
@@ -235,8 +234,7 @@ If given a SOURCE, execute the CMD on it."
 
 (defvar zig-font-lock-keywords
   (append
-   `(
-     ;; Builtins (prefixed with @)
+   `(;; Builtins (prefixed with @)
      (,(concat "@" zig-re-identifier) . font-lock-builtin-face)
 
      ;; Keywords, constants and types
@@ -246,8 +244,7 @@ If given a SOURCE, execute the CMD on it."
 
      ;; Type annotations (both variable and type)
      (,zig-re-type-annotation 1 font-lock-variable-name-face)
-     (,zig-re-type-annotation 2 font-lock-type-face)
-     )
+     (,zig-re-type-annotation 2 font-lock-type-face))
 
    ;; Definitions
    (mapcar (lambda (x)
@@ -470,24 +467,23 @@ This is written mainly to be used as `end-of-defun-function' for Zig."
                   '("enum" "struct" "union"))
           `(("Fn" ,(zig-re-definition "fn") 1))))
 
-;;; Guarantee filesystem unix line endings
 (defun zig-file-coding-system ()
+  "Guarantee filesystem unix line endings."
   (with-current-buffer (current-buffer)
     (if (buffer-file-name)
         (if (string-match "\\.d?zig\\'" buffer-file-name)
             (setq buffer-file-coding-system 'utf-8-unix)
-          nil))
-))
+          nil))))
 
 (add-hook 'zig-mode-hook 'zig-file-coding-system)
 
 (defvar zig-mode-map
   (let ((map (make-sparse-keymap)))
-	(define-key map (kbd "C-c C-b") 'zig-compile)
-	(define-key map (kbd "C-c C-f") 'zig-format-buffer)
-	(define-key map (kbd "C-c C-r") 'zig-run)
-	(define-key map (kbd "C-c C-t") 'zig-test-buffer)
-	map)
+    (define-key map (kbd "C-c C-b") #'zig-compile)
+    (define-key map (kbd "C-c C-f") #'zig-format-buffer)
+    (define-key map (kbd "C-c C-r") #'zig-run)
+    (define-key map (kbd "C-c C-t") #'zig-test-buffer)
+    map)
   "Keymap for Zig major mode.")
 
 ;;;###autoload
