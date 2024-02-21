@@ -480,17 +480,17 @@ This is written mainly to be used as `end-of-defun-function' for Zig."
         (if (string-match "\\.d?zig\\'" buffer-file-name)
             (setq buffer-file-coding-system 'utf-8-unix)
           nil))
-))
+    ))
 
 (add-hook 'zig-mode-hook 'zig-file-coding-system)
 
 (defvar zig-mode-map
   (let ((map (make-sparse-keymap)))
-	(define-key map (kbd "C-c C-b") 'zig-compile)
-	(define-key map (kbd "C-c C-f") 'zig-format-buffer)
-	(define-key map (kbd "C-c C-r") 'zig-run)
-	(define-key map (kbd "C-c C-t") 'zig-test-buffer)
-	map)
+    (define-key map (kbd "C-c C-b") 'zig-compile)
+    (define-key map (kbd "C-c C-f") 'zig-format-buffer)
+    (define-key map (kbd "C-c C-r") 'zig-run)
+    (define-key map (kbd "C-c C-t") 'zig-test-buffer)
+    map)
   "Keymap for Zig major mode.")
 
 ;;;###autoload
