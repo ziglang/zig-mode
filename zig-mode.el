@@ -1,12 +1,12 @@
 ;;; zig-mode.el --- A major mode for the Zig programming language -*- lexical-binding: t -*-
 
-;; Version: 0.0.8
 ;; Author: Andrea Orru <andreaorru1991@gmail.com>
 ;;         Andrew Kelley <superjoe30@gmail.com>
 ;; Maintainer: Shen, Jen-Chieh <jcs090218@gmail.com>
+;; URL: https://github.com/zig-lang/zig-mode
+;; Version: 0.0.8
+;; Package-Requires: ((emacs "26.1") (reformatter "0.6"))
 ;; Keywords: zig, languages
-;; Package-Requires: ((emacs "24.3") (reformatter "0.6"))
-;; Homepage: https://github.com/zig-lang/zig-mode
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
