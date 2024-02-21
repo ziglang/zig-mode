@@ -50,4 +50,8 @@ jobs:
 
     - uses: actions/checkout@v2
     - name: Run tests
-      run: ./run_tests.sh
+      run: |
+        eask install-deps
+        eask package
+        eask install
+        eask compile
