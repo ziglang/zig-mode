@@ -479,10 +479,10 @@ This is written mainly to be used as `end-of-defun-function' for Zig."
 
 (defvar zig-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-c C-b") 'zig-compile)
-    (define-key map (kbd "C-c C-f") 'zig-format-buffer)
-    (define-key map (kbd "C-c C-r") 'zig-run)
-    (define-key map (kbd "C-c C-t") 'zig-test-buffer)
+    (define-key map (kbd "C-c C-b") #'zig-compile)
+    (define-key map (kbd "C-c C-f") #'zig-format-buffer)
+    (define-key map (kbd "C-c C-r") #'zig-run)
+    (define-key map (kbd "C-c C-t") #'zig-test-buffer)
     map)
   "Keymap for Zig major mode.")
 
