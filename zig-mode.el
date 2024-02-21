@@ -225,7 +225,7 @@ If given a SOURCE, execute the CMD on it."
     "null" "undefined"))
 
 (defconst zig-electric-indent-chars
-  '(?\; ?, ?\) ?\] ?}))
+  '(?\; ?\, ?\) ?\] ?\}))
 
 (defface zig-multiline-string-face
   '((t :inherit font-lock-string-face))
