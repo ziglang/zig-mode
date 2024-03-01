@@ -39,49 +39,36 @@
 (defcustom zig-indent-offset 4
   "Indent Zig code by this number of spaces."
   :type 'integer
-  :group 'zig-mode
   :safe #'integerp)
 
 (defcustom zig-format-on-save t
   "Format buffers before saving using zig fmt."
   :type 'boolean
-  :safe #'booleanp
-  :group 'zig-mode)
-
-(defcustom zig-format-show-buffer t
-  "Show a *zig-fmt* buffer after zig fmt completes with errors"
-  :type 'boolean
-  :safe #'booleanp
-  :group 'zig-mode)
+  :safe #'booleanp)
 
 (defcustom zig-zig-bin "zig"
   "Path to zig executable."
   :type 'file
-  :safe #'stringp
-  :group 'zig-mode)
+  :safe #'stringp)
 
 (defcustom zig-run-optimization-mode "Debug"
   "Optimization mode to run code with."
   :type 'string
-  :safe #'stringp
-  :group 'zig-mode)
+  :safe #'stringp)
 
 (defcustom zig-test-optimization-mode "Debug"
   "Optimization mode to run tests with."
   :type 'string
-  :safe #'stringp
-  :group 'zig-mode)
+  :safe #'stringp)
 
 ;; zig CLI commands
 
 (defun zig--run-cmd (cmd &optional source &rest args)
   "Use compile command to execute a zig CMD with ARGS if given.
 If given a SOURCE, execute the CMD on it."
-  (let ((cmd-args
-         (if source
-             (mapconcat 'shell-quote-argument (cons source args) " ")
-           args)))
-    (compilation-start (concat zig-zig-bin " " cmd " " cmd-args))))
+  (let ((cmd-args (if source (cons source args) args)))
+    (compilation-start (mapconcat 'shell-quote-argument
+                                  `(,zig-zig-bin ,cmd ,@cmd-args) " "))))
 
 ;;;###autoload
 (defun zig-compile ()
@@ -229,8 +216,7 @@ If given a SOURCE, execute the CMD on it."
 
 (defface zig-multiline-string-face
   '((t :inherit font-lock-string-face))
-  "Face for multiline string literals."
-  :group 'zig-mode)
+  "Face for multiline string literals.")
 
 (defvar zig-font-lock-keywords
   (append
@@ -441,14 +427,12 @@ This is written mainly to be used as `end-of-defun-function' for Zig."
    (point) end))
 
 (defun zig-mode-syntactic-face-function (state)
-  (if (nth 3 state)
-      (save-excursion
-        (goto-char (nth 8 state))
+  (save-excursion
+    (goto-char (nth 8 state))
+    (if (nth 3 state)
         (if (looking-at "\\\\\\\\")
             'zig-multiline-string-face
-          'font-lock-string-face))
-    (save-excursion
-      (goto-char (nth 8 state))
+          'font-lock-string-face)
       (if (looking-at "//[/|!][^/]")
           'font-lock-doc-face
         'font-lock-comment-face))))
@@ -467,16 +451,6 @@ This is written mainly to be used as `end-of-defun-function' for Zig."
                   '("enum" "struct" "union"))
           `(("Fn" ,(zig-re-definition "fn") 1))))
 
-(defun zig-file-coding-system ()
-  "Guarantee filesystem unix line endings."
-  (with-current-buffer (current-buffer)
-    (if (buffer-file-name)
-        (if (string-match "\\.d?zig\\'" buffer-file-name)
-            (setq buffer-file-coding-system 'utf-8-unix)
-          nil))))
-
-(add-hook 'zig-mode-hook 'zig-file-coding-system)
-
 (defvar zig-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-c C-b") #'zig-compile)
@@ -488,10 +462,7 @@ This is written mainly to be used as `end-of-defun-function' for Zig."
 
 ;;;###autoload
 (define-derived-mode zig-mode prog-mode "Zig"
-  "A major mode for the Zig programming language.
-
-\\{zig-mode-map}"
-  :group 'zig-mode
+  "A major mode for the Zig programming language."
   (setq-local comment-start "// ")
   (setq-local comment-start-skip "//+ *")
   (setq-local comment-end "")
@@ -505,6 +476,7 @@ This is written mainly to be used as `end-of-defun-function' for Zig."
   (setq-local indent-tabs-mode nil)  ; Zig forbids tab characters.
   (setq-local syntax-propertize-function 'zig-syntax-propertize)
   (setq-local imenu-generic-expression zig-imenu-generic-expression)
+  (setq buffer-file-coding-system 'utf-8-unix) ; zig source is always utf-8
   (setq font-lock-defaults '(zig-font-lock-keywords
                              nil nil nil nil
                              (font-lock-syntactic-face-function . zig-mode-syntactic-face-function)))
