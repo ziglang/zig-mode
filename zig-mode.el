@@ -46,11 +46,6 @@
   :type 'boolean
   :safe #'booleanp)
 
-(defcustom zig-format-show-buffer t
-  "Show a *zig-fmt* buffer after zig fmt completes with errors"
-  :type 'boolean
-  :safe #'booleanp)
-
 (defcustom zig-zig-bin "zig"
   "Path to zig executable."
   :type 'file
