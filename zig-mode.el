@@ -427,14 +427,12 @@ This is written mainly to be used as `end-of-defun-function' for Zig."
    (point) end))
 
 (defun zig-mode-syntactic-face-function (state)
-  (if (nth 3 state)
-      (save-excursion
-        (goto-char (nth 8 state))
+  (save-excursion
+    (goto-char (nth 8 state))
+    (if (nth 3 state)
         (if (looking-at "\\\\\\\\")
             'zig-multiline-string-face
-          'font-lock-string-face))
-    (save-excursion
-      (goto-char (nth 8 state))
+          'font-lock-string-face)
       (if (looking-at "//[/|!][^/]")
           'font-lock-doc-face
         'font-lock-comment-face))))
