@@ -39,38 +39,32 @@
 (defcustom zig-indent-offset 4
   "Indent Zig code by this number of spaces."
   :type 'integer
-  :group 'zig-mode
   :safe #'integerp)
 
 (defcustom zig-format-on-save t
   "Format buffers before saving using zig fmt."
   :type 'boolean
-  :safe #'booleanp
-  :group 'zig-mode)
+  :safe #'booleanp)
 
 (defcustom zig-format-show-buffer t
   "Show a *zig-fmt* buffer after zig fmt completes with errors"
   :type 'boolean
-  :safe #'booleanp
-  :group 'zig-mode)
+  :safe #'booleanp)
 
 (defcustom zig-zig-bin "zig"
   "Path to zig executable."
   :type 'file
-  :safe #'stringp
-  :group 'zig-mode)
+  :safe #'stringp)
 
 (defcustom zig-run-optimization-mode "Debug"
   "Optimization mode to run code with."
   :type 'string
-  :safe #'stringp
-  :group 'zig-mode)
+  :safe #'stringp)
 
 (defcustom zig-test-optimization-mode "Debug"
   "Optimization mode to run tests with."
   :type 'string
-  :safe #'stringp
-  :group 'zig-mode)
+  :safe #'stringp)
 
 ;; zig CLI commands
 
@@ -229,8 +223,7 @@ If given a SOURCE, execute the CMD on it."
 
 (defface zig-multiline-string-face
   '((t :inherit font-lock-string-face))
-  "Face for multiline string literals."
-  :group 'zig-mode)
+  "Face for multiline string literals.")
 
 (defvar zig-font-lock-keywords
   (append
@@ -491,7 +484,6 @@ This is written mainly to be used as `end-of-defun-function' for Zig."
   "A major mode for the Zig programming language.
 
 \\{zig-mode-map}"
-  :group 'zig-mode
   (setq-local comment-start "// ")
   (setq-local comment-start-skip "//+ *")
   (setq-local comment-end "")
