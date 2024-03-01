@@ -458,16 +458,6 @@ This is written mainly to be used as `end-of-defun-function' for Zig."
                   '("enum" "struct" "union"))
           `(("Fn" ,(zig-re-definition "fn") 1))))
 
-(defun zig-file-coding-system ()
-  "Guarantee filesystem unix line endings."
-  (with-current-buffer (current-buffer)
-    (if (buffer-file-name)
-        (if (string-match "\\.d?zig\\'" buffer-file-name)
-            (setq buffer-file-coding-system 'utf-8-unix)
-          nil))))
-
-(add-hook 'zig-mode-hook 'zig-file-coding-system)
-
 (defvar zig-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-c C-b") #'zig-compile)
@@ -493,6 +483,7 @@ This is written mainly to be used as `end-of-defun-function' for Zig."
   (setq-local indent-tabs-mode nil)  ; Zig forbids tab characters.
   (setq-local syntax-propertize-function 'zig-syntax-propertize)
   (setq-local imenu-generic-expression zig-imenu-generic-expression)
+  (setq buffer-file-coding-system 'utf-8-unix) ; zig source is always utf-8
   (setq font-lock-defaults '(zig-font-lock-keywords
                              nil nil nil nil
                              (font-lock-syntactic-face-function . zig-mode-syntactic-face-function)))
