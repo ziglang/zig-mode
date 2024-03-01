@@ -71,11 +71,9 @@
 (defun zig--run-cmd (cmd &optional source &rest args)
   "Use compile command to execute a zig CMD with ARGS if given.
 If given a SOURCE, execute the CMD on it."
-  (let ((cmd-args
-         (if source
-             (mapconcat 'shell-quote-argument (cons source args) " ")
-           args)))
-    (compilation-start (concat zig-zig-bin " " cmd " " cmd-args))))
+  (let ((cmd-args (if source (cons source args) args)))
+    (compilation-start (mapconcat 'shell-quote-argument
+                                  `(,zig-zig-bin ,cmd ,@cmd-args) " "))))
 
 ;;;###autoload
 (defun zig-compile ()
