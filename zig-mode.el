@@ -127,9 +127,9 @@ If given a SOURCE, execute the CMD on it."
   :group 'zig-mode
   :lighter " ZigFmt")
 
-;;;###autoload (autoload 'zig-format-buffer "current-file" nil t)
-;;;###autoload (autoload 'zig-format-region "current-file" nil t)
-;;;###autoload (autoload 'zig-format-on-save-mode "current-file" nil t)
+;;;###autoload (autoload 'zig-format-buffer "zig-mode" nil t)
+;;;###autoload (autoload 'zig-format-region "zig-mode" nil t)
+;;;###autoload (autoload 'zig-format-on-save-mode "zig-mode" nil t)
 
 (defun zig-re-word (inner)
   "Construct a regular expression for the word INNER."
