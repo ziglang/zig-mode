@@ -479,9 +479,7 @@ This is written mainly to be used as `end-of-defun-function' for Zig."
 
 ;;;###autoload
 (define-derived-mode zig-mode prog-mode "Zig"
-  "A major mode for the Zig programming language.
-
-\\{zig-mode-map}"
+  "A major mode for the Zig programming language."
   (setq-local comment-start "// ")
   (setq-local comment-start-skip "//+ *")
   (setq-local comment-end "")
