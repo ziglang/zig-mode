@@ -134,11 +134,12 @@ If given a SOURCE, execute the CMD on it."
   (concat "\\(?:" zig-re-optional "\\|" zig-re-pointer "\\|" zig-re-array "\\)*"))
 
 (defconst zig-re-identifier "[[:word:]_][[:word:]_[:digit:]]*")
+(defconst zig-re-type "[[:word:]_.][[:word:]_.[:digit:]]*")
 (defconst zig-re-type-annotation
   (concat (zig-re-grab zig-re-identifier)
           "[[:space:]]*:[[:space:]]*"
           zig-re-optionals-pointers-arrays
-          (zig-re-grab zig-re-identifier)))
+          (zig-re-grab zig-re-type)))
 
 (defun zig-re-definition (dtype)
   "Construct a regular expression for definitions of type DTYPE."

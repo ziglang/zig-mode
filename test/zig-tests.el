@@ -118,6 +118,26 @@ const python =
      ("void" font-lock-type-face)
      )))
 
+(ert-deftest test-font-lock-parameters-with-periods ()
+  (zig-test-font-lock
+   "fn doSomething(arg: thing.with.periods) void {}"
+   '(("fn" font-lock-keyword-face)
+     ("doSomething" font-lock-function-name-face)
+     ("arg" font-lock-variable-name-face)
+     ("thing.with.periods" font-lock-type-face)
+     ("void" font-lock-type-face)
+     )))
+
+(ert-deftest test-font-lock-struct-type-with-periods ()
+  (zig-test-font-lock
+   "const S = struct { field: thing.with.periods }; "
+   '(("const" font-lock-keyword-face)
+     ("S" font-lock-variable-name-face)
+     ("struct" font-lock-keyword-face)
+     ("field" font-lock-variable-name-face)
+     ("thing.with.periods" font-lock-type-face)
+     )))
+
 ;; Test all permutations of '?', '*', '[]', '* const', and '[] const' for 3 of those in a row
 ;; For example, ??[]Bar or [][]const *Bar
 (ert-deftest test-font-lock-parameters-optionals-pointers-and-arrays ()
