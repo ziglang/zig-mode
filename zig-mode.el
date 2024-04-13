@@ -361,18 +361,19 @@ This is written mainly to be used as `end-of-defun-function' for Zig."
                            (and (not (looking-at " *\\(//[^\n]*\\)?\n"))
                                 (current-column)))
                          (+ prev-block-indent-col zig-indent-offset))))
-                  ;; is-expr-continutation: True if this line continues an
+                  ;; is-expr-continuation: True if this line continues an
                   ;; expression from the previous line, false otherwise.
-                  (is-expr-continutation
+                  (is-expr-continuation
                    (and
                     (not (looking-at "[]});]\\|else"))
                     (save-excursion
                       (zig-skip-backwards-past-whitespace-and-comments)
                       (when (> (point) 1)
                         (backward-char)
-                        (not (looking-at "[,;([{}]")))))))
+                        (or (zig-currently-in-str)
+                            (not (looking-at "[,;([{}]"))))))))
              ;; Now we can calculate indent-col:
-             (if is-expr-continutation
+             (if is-expr-continuation
                  (+ base-indent-col zig-indent-offset)
                base-indent-col)))))
     ;; If point is within the indentation whitespace, move it to the end of the
@@ -383,53 +384,23 @@ This is written mainly to be used as `end-of-defun-function' for Zig."
         (indent-line-to indent-col)
       (save-excursion (indent-line-to indent-col)))))
 
-(defun zig-syntax-propertize-to-newline-if-in-multiline-str (end)
-  ;; First, we need to check if we're in a multiline string literal; if we're
-  ;; not, do nothing.
-  (when (zig-currently-in-str)
-    (let ((start (zig-start-of-current-str-or-comment)))
-      (when (save-excursion
-              (goto-char start)
-              (looking-at "\\\\\\\\"))
-        ;; At this point, we've determined that we're within a multiline string
-        ;; literal.  Let `stop' be the position of the closing newline, or
-        ;; `end', whichever comes first.
-        (let ((stop (if (save-excursion
-                          (goto-char start)
-                          (re-search-forward "\n" end t))
-                        (prog1 (match-end 0)
-                          ;; We found the closing newline, so mark it as the
-                          ;; end of this string literal.
-                          (put-text-property (match-beginning 0)
-                                             (match-end 0)
-                                             'syntax-table
-                                             (string-to-syntax "|")))
-                      end)))
-          ;; Zig multiline string literals don't support escapes, so mark all
-          ;; backslashes (up to `stop') as punctation instead of escapes.
-          (save-excursion
-            (goto-char (1+ start))
-            (while (re-search-forward "\\\\" stop t)
-              (put-text-property (match-beginning 0) (match-end 0)
-                                 'syntax-table (string-to-syntax "."))
-              (goto-char (match-end 0))))
-          ;; Move to the end of the string (or `end'), so that
-          ;; zig-syntax-propertize can pick up from there.
-          (goto-char stop))))))
+(defun zig-syntax-propertize-multiline-string (end)
+  (let* ((eol (save-excursion (search-forward "\n" end t)))
+         (stop (or eol end)))
+    (while (search-forward "\\" stop t)
+      (put-text-property (match-beginning 0) (match-end 0) 'syntax-table (string-to-syntax ".")))
+    (when eol (put-text-property (- eol 2) (1- eol) 'syntax-table (string-to-syntax "|")))
+    (goto-char stop)))
 
 (defun zig-syntax-propertize (start end)
   (goto-char start)
-  (zig-syntax-propertize-to-newline-if-in-multiline-str end)
-  (funcall
-   (syntax-propertize-rules
-    ;; Multiline strings
-    ;; Do not match backslashes that are preceded by single or
-    ;; double-quotes.
-    ("[^\\'\"]c?\\(\\\\\\)\\\\"
-     (1 (prog1 "|"
-          (goto-char (match-end 0))
-          (zig-syntax-propertize-to-newline-if-in-multiline-str end)))))
-   (point) end))
+  (when (eq t (zig-currently-in-str))
+    (zig-syntax-propertize-multiline-string end))
+  (while (search-forward "\\\\" end t)
+    (when (null (save-excursion (backward-char 2) (zig-currently-in-str)))
+      (backward-char)
+      (put-text-property (match-beginning 0) (point) 'syntax-table (string-to-syntax "|"))
+      (zig-syntax-propertize-multiline-string end))))
 
 (defun zig-mode-syntactic-face-function (state)
   (save-excursion
