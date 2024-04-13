@@ -164,6 +164,17 @@ const python =
                                ("void" font-lock-type-face)))))
       (zig-test-font-lock test-string expected))))
 
+(ert-deftest test-font-lock-int-types ()
+  (zig-test-font-lock
+   "const Types = .{ u0, i7, u33, i123, u55555 };"
+   '(("const" font-lock-keyword-face)
+     ("Types" font-lock-variable-name-face)
+     ("u0" font-lock-type-face)
+     ("i7" font-lock-type-face)
+     ("u33" font-lock-type-face)
+     ("i123" font-lock-type-face)
+     ("u55555" font-lock-type-face))))
+
 ;;===========================================================================;;
 ;; Indentation tests
 

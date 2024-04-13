@@ -163,55 +163,6 @@ If given a SOURCE, execute the CMD on it."
 
     table))
 
-(defconst zig-keywords
-  '(;; Storage
-    "const" "var" "extern" "packed" "export" "pub" "noalias" "inline"
-    "noinline" "comptime" "callconv" "volatile" "allowzero"
-    "align" "linksection" "threadlocal" "addrspace"
-
-    ;; Structure
-    "struct" "enum" "union" "error" "opaque"
-
-    ;; Statement
-    "break" "return" "continue" "asm" "defer" "errdefer" "unreachable"
-    "try" "catch" "async" "nosuspend" "await" "suspend" "resume"
-
-    ;; Conditional
-    "if" "else" "switch" "and" "or" "orelse"
-
-    ;; Repeat
-    "while" "for"
-
-    ;; Other keywords
-    "fn" "usingnamespace" "test"))
-
-(defconst zig-types
-  '(;; Integer types
-    "i2" "u2" "i3" "u3" "i4" "u4" "i5" "u5" "i6" "u6" "i7" "u7" "i8" "u8"
-    "i16" "u16" "i29" "u29" "i32" "u32" "i64" "u64" "i128" "u128"
-    "isize" "usize"
-
-    ;; Floating types
-    "f16" "f32" "f64" "f80" "f128"
-
-    ;; C types
-    "c_char" "c_short" "c_ushort" "c_int" "c_uint" "c_long" "c_ulong"
-    "c_longlong" "c_ulonglong" "c_longdouble"
-
-    ;; Comptime types
-    "comptime_int" "comptime_float"
-
-    ;; Other types
-    "bool" "void" "noreturn" "type" "error" "anyerror" "anyframe" "anytype"
-    "anyopaque"))
-
-(defconst zig-constants
-  '(;; Boolean
-    "true" "false"
-
-    ;; Other constants
-    "null" "undefined"))
-
 (defconst zig-electric-indent-chars
   '(?\; ?\, ?\) ?\] ?\}))
 
@@ -225,9 +176,62 @@ If given a SOURCE, execute the CMD on it."
      (,(concat "@" zig-re-identifier) . font-lock-builtin-face)
 
      ;; Keywords, constants and types
-     (,(regexp-opt zig-keywords  'symbols) . font-lock-keyword-face)
-     (,(regexp-opt zig-constants 'symbols) . font-lock-constant-face)
-     (,(regexp-opt zig-types     'symbols) . font-lock-type-face)
+     (,(rx symbol-start
+           (|
+            ;; Storage
+            "const" "var" "extern" "packed" "export" "pub" "noalias" "inline"
+            "noinline" "comptime" "callconv" "volatile" "allowzero"
+            "align" "linksection" "threadlocal" "addrspace"
+
+            ;; Structure
+            "struct" "enum" "union" "error" "opaque"
+
+            ;; Statement
+            "break" "return" "continue" "asm" "defer" "errdefer" "unreachable"
+            "try" "catch" "async" "nosuspend" "await" "suspend" "resume"
+
+            ;; Conditional
+            "if" "else" "switch" "and" "or" "orelse"
+
+            ;; Repeat
+            "while" "for"
+
+            ;; Other keywords
+            "fn" "usingnamespace" "test")
+           symbol-end)
+      . font-lock-keyword-face)
+
+     (,(rx symbol-start
+           (|
+            ;; Boolean
+            "true" "false"
+
+            ;; Other constants
+            "null" "undefined")
+           symbol-end)
+      . font-lock-constant-face)
+
+     (,(rx symbol-start
+           (|
+            ;; Integer types
+            (: (any ?i ?u) (| ?0 (: (any (?1 . ?9)) (* digit))))
+            "isize" "usize"
+
+            ;; Floating types
+            "f16" "f32" "f64" "f80" "f128"
+
+            ;; C types
+            "c_char" "c_short" "c_ushort" "c_int" "c_uint" "c_long" "c_ulong"
+            "c_longlong" "c_ulonglong" "c_longdouble"
+
+            ;; Comptime types
+            "comptime_int" "comptime_float"
+
+            ;; Other types
+            "bool" "void" "noreturn" "type" "anyerror" "anyframe" "anytype"
+            "anyopaque")
+           symbol-end)
+      . font-lock-type-face)
 
      ;; Type annotations (both variable and type)
      (,zig-re-type-annotation 1 font-lock-variable-name-face)
