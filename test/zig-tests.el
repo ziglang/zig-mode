@@ -40,7 +40,7 @@ const string =
 ;"
    '(("const" font-lock-keyword-face)
      ("string" font-lock-variable-name-face)
-     ("\\\\ This newline is NOT escaped \\\n" zig-multiline-string-face))))
+     ("\\\\ This newline is NOT escaped \\" zig-multiline-string-face))))
 
 (ert-deftest test-font-lock-backslash-in-str-literal ()
   (zig-test-font-lock
@@ -100,8 +100,8 @@ const python =
 ;"
    '(("const" font-lock-keyword-face)
      ("python" font-lock-variable-name-face)
-     ("\\\\def main():\n" zig-multiline-string-face)
-     ("\\\\    print(\"Hello, world!\")\n" zig-multiline-string-face))))
+     ("\\\\def main():" zig-multiline-string-face)
+     ("\\\\    print(\"Hello, world!\")" zig-multiline-string-face))))
 
 (ert-deftest test-font-lock-parameters-pointers-and-arrays ()
   (zig-test-font-lock
@@ -163,6 +163,27 @@ const python =
                              '(("Bar" font-lock-type-face)
                                ("void" font-lock-type-face)))))
       (zig-test-font-lock test-string expected))))
+
+(ert-deftest test-font-lock-int-types ()
+  (zig-test-font-lock
+   "const Types = .{ u0, i7, u33, i123, u55555 };"
+   '(("const" font-lock-keyword-face)
+     ("Types" font-lock-variable-name-face)
+     ("u0" font-lock-type-face)
+     ("i7" font-lock-type-face)
+     ("u33" font-lock-type-face)
+     ("i123" font-lock-type-face)
+     ("u55555" font-lock-type-face))))
+
+(ert-deftest test-font-lock-escaped-backslash ()
+  (zig-test-font-lock
+   "const a = foo('\\\\', \"C:\\\\\", \\\\
+);"
+   '(("const" font-lock-keyword-face)
+     ("a" font-lock-variable-name-face)
+     ("'\\\\'" font-lock-string-face)
+     ("\"C:\\\\\"" font-lock-string-face)
+     ("\\\\" zig-multiline-string-face))))
 
 ;;===========================================================================;;
 ;; Indentation tests
