@@ -453,6 +453,7 @@ This is written mainly to be used as `end-of-defun-function' for Zig."
   (setq-local indent-tabs-mode nil)  ; Zig forbids tab characters.
   (setq-local syntax-propertize-function 'zig-syntax-propertize)
   (setq-local imenu-generic-expression zig-imenu-generic-expression)
+  (setq-local compile-command "zig build")
   (setq buffer-file-coding-system 'utf-8-unix) ; zig source is always utf-8
   (setq font-lock-defaults '(zig-font-lock-keywords
                              nil nil nil nil
