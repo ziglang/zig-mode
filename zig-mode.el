@@ -141,6 +141,9 @@ If given a SOURCE, execute the CMD on it."
           zig-re-optionals-pointers-arrays
           (zig-re-grab zig-re-type)))
 
+(defconst zig-re-block-label-open " \\([[:word:]]:\\) *{")
+(defconst zig-re-block-label-break "break[[:space:]]*\\(:[[:word:]]+\\)")
+
 (defun zig-re-definition (dtype)
   "Construct a regular expression for definitions of type DTYPE."
   (concat (zig-re-word dtype) "[[:space:]]+" (zig-re-grab zig-re-identifier)))
@@ -232,6 +235,10 @@ If given a SOURCE, execute the CMD on it."
             "anyopaque")
            symbol-end)
       . font-lock-type-face)
+
+     ;; Block labels
+     (,zig-re-block-label-open 1 font-lock-constant-face)
+     (,zig-re-block-label-break 1 font-lock-constant-face)
 
      ;; Type annotations (both variable and type)
      (,zig-re-type-annotation 1 font-lock-variable-name-face)
