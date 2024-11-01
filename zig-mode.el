@@ -67,6 +67,7 @@
   "Use compile command to execute a zig CMD with ARGS if given.
 If given a SOURCE, execute the CMD on it."
   (let ((cmd-args (if source (cons source args) args)))
+    (save-some-buffers)
     (compilation-start (mapconcat 'shell-quote-argument
                                   `(,zig-zig-bin ,cmd ,@cmd-args) " "))))
 
