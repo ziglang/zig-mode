@@ -36,6 +36,11 @@
   :link '(url-link "https://ziglang.org/")
   :group 'languages)
 
+(defcustom zig-mode-hook nil
+  "Hook called by `zig-mode'."
+  :type 'hook
+  :group 'zig-mode)
+
 (defcustom zig-indent-offset 4
   "Indent Zig code by this number of spaces."
   :type 'integer
