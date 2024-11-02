@@ -141,8 +141,8 @@ If given a SOURCE, execute the CMD on it."
           zig-re-optionals-pointers-arrays
           (zig-re-grab zig-re-type)))
 
-(defconst zig-re-block-label-open " \\([[:word:]]:\\) *{")
-(defconst zig-re-block-label-break "break[[:space:]]*\\(:[[:word:]]+\\)")
+(defconst zig-re-block-label-open " \\([[:word:]_]+:\\)[[:space:]]*{")
+(defconst zig-re-block-label-break "break[[:space:]]*\\(:[[:word:]_]+\\)")
 
 (defun zig-re-definition (dtype)
   "Construct a regular expression for definitions of type DTYPE."
