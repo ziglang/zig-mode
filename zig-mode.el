@@ -447,8 +447,15 @@ This is written mainly to be used as `end-of-defun-function' for Zig."
 ;;;###autoload
 (define-derived-mode zig-mode prog-mode "Zig"
   "A major mode for the Zig programming language."
+  (setq-local adaptive-fill-regexp
+	      (concat "//[!/]* *"
+		  (if (default-value 'adaptive-fill-regexp)
+		      (concat "\\("
+			      (default-value 'adaptive-fill-regexp)
+			      "\\)")
+		    "")))
   (setq-local comment-start "// ")
-  (setq-local comment-start-skip "//+ *")
+  (setq-local comment-start-skip "//[!/]* *")
   (setq-local comment-end "")
   (setq-local electric-indent-chars
               (append zig-electric-indent-chars
