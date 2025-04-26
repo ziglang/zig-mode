@@ -1,3 +1,5 @@
+;; -*- mode: eask; lexical-binding: t -*-
+
 (package "zig-mode"
          "0.0.8"
          "A major mode for the Zig programming language")
