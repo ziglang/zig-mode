@@ -46,6 +46,11 @@
   :type 'boolean
   :safe #'booleanp)
 
+(defcustom zig-ast-check-on-format nil
+  "Look for simple compile errors on format."
+  :type 'boolean
+  :safe #'booleanp)
+
 (defcustom zig-zig-bin "zig"
   "Path to zig executable."
   :type 'file
@@ -108,10 +113,11 @@ If given a SOURCE, execute the CMD on it."
   (zig--run-cmd "run" (file-local-name (buffer-file-name)) "-O" zig-run-optimization-mode))
 
 ;; zig fmt
-
 (reformatter-define zig-format
   :program zig-zig-bin
-  :args '("fmt" "--stdin")
+  :args (append '("fmt" "--stdin")
+                (when (string-match-p "\\.zon\\'" buffer-file-name) '("--zon"))
+                (when zig-ast-check-on-format '("--ast-check")))
   :group 'zig-mode
   :lighter " ZigFmt")
 
