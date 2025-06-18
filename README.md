@@ -29,7 +29,7 @@ Then add the following to your `.emacs` file:
 (unless (version< emacs-version "24")
   (add-to-list 'load-path "~/path/to/your/zig-mode/")
   (autoload 'zig-mode "zig-mode" nil t)
-  (add-to-list 'auto-mode-alist '("\\.zig\\'" . zig-mode)))
+  (add-to-list 'auto-mode-alist '("\\.\\(zig\\|zon\\)\\'" . zig-mode))
 ```
 
 ## Testing
