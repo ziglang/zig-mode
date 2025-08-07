@@ -198,7 +198,7 @@ If given a SOURCE, execute the CMD on it."
 
             ;; Statement
             "break" "return" "continue" "asm" "defer" "errdefer" "unreachable"
-            "try" "catch" "async" "nosuspend" "await" "suspend" "resume"
+            "try" "catch" "nosuspend" "suspend" "resume"
 
             ;; Conditional
             "if" "else" "switch" "and" "or" "orelse"
@@ -207,7 +207,7 @@ If given a SOURCE, execute the CMD on it."
             "while" "for"
 
             ;; Other keywords
-            "fn" "usingnamespace" "test")
+            "fn" "test")
            symbol-end)
       . font-lock-keyword-face)
 
