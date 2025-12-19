@@ -66,6 +66,17 @@
   :type 'string
   :safe #'stringp)
 
+(defcustom zig-flymake t
+  "Enable zig flymake integration."
+  :type 'boolean
+  :safe #'booleanp
+  :group 'zig-mode)
+
+(defcustom zig-flymake-command '("zig" "build" "test")
+  "Command to execute when calling flymake-start."
+  :type (repeat 'string)
+  :group 'zig-mode)
+
 ;; zig CLI commands
 
 (defun zig--run-cmd (cmd &optional source &rest args)
@@ -111,6 +122,66 @@ If given a SOURCE, execute the CMD on it."
   "Create an executable from the current buffer and run it immediately."
   (interactive)
   (zig--run-cmd "run" (file-local-name (buffer-file-name)) "-O" zig-run-optimization-mode))
+
+;; zig flymake
+
+(defvar zig--flymake-proc nil
+  "Current zig flymake process.")
+(defun zig-flymake (report-fn &rest _args)
+  "Zig flymake command, called by flymake-start."
+  (unless (executable-find "zig")
+    (error "Cannot find suitable zig executable"))
+  ;; Kill the last zig--flymake-proc, as flymake can spawn them indefinitely.
+  (when (process-live-p zig--flymake-proc)
+    (kill-process zig--flymake-proc))
+
+  (save-restriction
+    (widen)
+    (setq
+     zig--flymake-proc
+     (make-process
+      :name "zig-flymake" :noquery t :connection-type 'pipe
+      :buffer (generate-new-buffer "*zig-flymake*")
+      :command zig-flymake-command
+      :sentinel
+      (lambda (proc _event)
+        (when (memq (process-status proc) '(exit signal))
+          (unwind-protect
+              (if (eq proc zig--flymake-proc)
+                  (with-current-buffer (process-buffer proc)
+                    (goto-char (point-min))
+                    (let ((diags '()))
+                      (while (search-forward-regexp
+                              "^\\(.*.zig\\):\\([0-9]+\\):\\([0-9]+\\): \\(.*\\)$" nil t)
+                        (let* ((msg (match-string 4))
+                               (file (match-string 1))
+                               (beg-line (string-to-number (match-string 2)))
+                               (beg-col (string-to-number (match-string 3)))
+                               ;; Zig does not warn, only errors or notes.
+                               (type (if (string-match "^error" msg)
+                                         :error
+                                       :note))
+                               (diag (flymake-make-diagnostic
+                                      file
+                                      (cons beg-line beg-col)
+                                      ;; Errors will have properly recalculated ends
+                                      ;; as when flymake-make-diagnostic gots file as
+                                      ;; locus, it automatically calls flymake-diag-region
+                                      ;; when trying to convert line and col into beg end.
+                                      nil
+                                      type
+                                      msg)))
+                          (setq diags (cons diag diags))))
+                      (funcall report-fn diags)))
+                (flymake-log :warning "Canceling obsolete check %s"
+                             proc))
+            (kill-buffer (process-buffer proc)))))))))
+
+(defun zig--setup-flymake-backend ()
+  (add-hook 'flymake-diagnostic-functions 'zig-flymake nil t))
+
+(if zig-flymake
+    (add-hook 'zig-mode-hook 'zig--setup-flymake-backend))
 
 ;; zig fmt
 (reformatter-define zig-format
